@@ -19,6 +19,7 @@ public class Controller {
 	private AccountDatabase accountDB;
 
 	@FXML private TextField accountNumber;
+	@FXML private TextField amount;
 	@FXML private TextField transactionAmount;
 	@FXML private Button deposit;
 	@FXML private Button withdraw;
@@ -89,6 +90,11 @@ public class Controller {
 		exitButton.setOnAction(event -> {
 			exit();
 		});
+
+		deposit.setOnAction(this::deposit);
+
+		withdraw.setOnAction(this::withdraw);
+
 	}
 
 	@FXML
@@ -326,6 +332,129 @@ public class Controller {
 		return null;
 	}
 
+
+	/**
+	 * This method handles the D command (deposit)
+	 * @param actionEvent
+	 */
+	@FXML
+	private void deposit(ActionEvent actionEvent) {
+		String accNumber = accountNumber.getText().trim();
+		String amountString = transactionAmount.getText().trim();
+
+		if(accNumber.isEmpty() || amountString.isEmpty()) {
+			System.out.println("Please fill in both fields.");
+			return;
+		}
+
+		double amount;
+
+		try {
+			amount = Double.parseDouble(amountString);
+			if (amount <= 0) { System.out.println(amount + " - deposit amount cannot be 0 or negative."); return; }
+		} catch(NumberFormatException e) {
+			System.out.println("For input string: \"" + amountString + "\" - not a valid amount."); return;
+		}
+		boolean accountFound = false;
+
+		for (int i = 0; i < accountDB.size(); i++) {
+			if (accountDB.get(i).getNumber().toString().equals(accNumber)) { accountFound = true;
+				accountDB.deposit(accountDB.get(i).getNumber(), amount);
+				System.out.println("$" + String.format("%,.2f", amount) +
+						" deposited to " + accNumber);
+
+				if (accountDB.get(i).getNumber().getType() == AccountType.MONEY_MARKET) {
+					MoneyMarket moneyAcc = (MoneyMarket) accountDB.get(i);
+					if (accountDB.get(i).getBalance() > MONEY_MARKET_MINIMUM_FOR_LOYAL) {
+						moneyAcc.setLoyal(true);
+					}
+				}
+				Activity deposit = new Activity(new Date(), accountDB.get(i).getNumber().getBranch(), 'D', amount, false);
+				accountDB.get(i).addActivity(deposit);
+				break;
+			}
+		}
+		if (!accountFound) { System.out.println(accNumber + " does not exist."); }
+
+	}
+
+
+	/**
+	 * This method handles the W command (withdraw)
+	 *
+	 * @param actionEvent
+	 */
+	@FXML
+	private void withdraw(ActionEvent actionEvent) {
+		String accNumber = accountNumber.getText().trim();
+		String amountString = transactionAmount.getText().trim();
+
+		if(accNumber.isEmpty() || amountString.isEmpty()) {
+			System.out.println("Please fill in both fields.");
+			return;
+		}
+
+		double amount;
+
+		try {
+			amount = Double.parseDouble(amountString);
+			if(amount <= 0){
+				System.out.println(amountString + " withdrawal amount cannot be 0 or negative.");
+				return;
+			}
+		} catch (NumberFormatException e) {
+			System.out.println("For input string: \"" + amountString + "\" - not a valid amount.");
+			return;
+		}
+
+		boolean accountFound = false;
+
+		for (int i = 0; i < accountDB.size(); i++) {
+			if (accountDB.get(i).getNumber().toString().replace(" ", "").equals(accNumber)) {
+				accountFound = true;
+
+				if (accountDB.get(i).getBalance() >= amount) {
+					Activity withdrawal = new Activity(new Date(), accountDB.get(i).getNumber().getBranch(), 'W', amount, false);
+					accountDB.get(i).addActivity(withdrawal);
+					accountDB.withdraw(accountDB.get(i).getNumber(), amount);
+
+					if (accountDB.get(i).getNumber().getType() == AccountType.MONEY_MARKET) {
+						MoneyMarket moneyAcc = (MoneyMarket) accountDB.get(i);
+						moneyAcc.incrementWithdrawals();
+
+						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
+							System.out.print(accNumber + " balance below $2,000 - ");
+							if (amount <= accountDB.get(i).getBalance()) {
+								System.out.println("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber);
+							}
+						}
+						else {
+								if (amount <= accountDB.get(i).getBalance()) { System.out.println("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber); }
+						}
+
+						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM_FOR_LOYAL) {
+							moneyAcc.setLoyal(false);
+						}
+						return;
+					}
+					System.out.println("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber);
+					return;
+				}
+				if (amount > accountDB.get(i).getBalance() && accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
+					System.out.println(accNumber + " balance below $2,000 - " + "withdrawing $" + String.format("%,.2f", amount) + " - insufficient funds.");
+					return;
+				}
+				else if (amount > accountDB.get(i).getBalance()) {
+					System.out.println(accNumber + " - insufficient funds.");
+					return;
+				}
+				break;
+			}
+		}
+		if(!accountFound) { System.out.println(accNumber + " does not exist."); }
+	}
+
+
 	@FXML
 	private void closeAccountByNumber(ActionEvent actionEvent) {
 		if (closeDate.getValue() == null || closeAccountNumber.getText().trim().isEmpty()) {
@@ -462,6 +591,9 @@ public class Controller {
 		return (balance * (rate / days_per_year) * day);
 	}
 
+
+
+
 	/**
 	 *
 	 */
@@ -495,6 +627,14 @@ public class Controller {
 		accountTypeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			hideElements(newValue);
 		});
+
+		/*
+		if (withdraw != null) {
+			withdraw.setOnAction(this::withdraw);
+		} else {
+			System.out.println("Withdraw button is NULL. Check FXML fx:id.");
+		}
+		*/
 
 	}
 }
