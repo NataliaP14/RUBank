@@ -102,8 +102,6 @@ public class Controller {
 	}
 
 
-	}
-
 	/**
 	 * This method is the implementation of the O command, gets user input and validates it to open an account.
 	 *
