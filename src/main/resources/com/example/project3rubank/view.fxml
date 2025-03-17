@@ -46,7 +46,7 @@
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
 
-
+                    <Text styleClass="section-title" text="Open Account" />
                     <GridPane alignment="TOP_CENTER" styleClass="section-title">
                         <VBox alignment="CENTER" spacing="15.0">
                             <HBox alignment="TOP_CENTER" spacing="15.0">

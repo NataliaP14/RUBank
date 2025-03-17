@@ -136,9 +136,9 @@ public class CertificateDeposit extends Savings {
 		maturityDateCal.add(Calendar.MONTH, term);
 
 		String maturityDateString =
-				(maturityDateCal.get(Calendar.MONTH) + 1) + "/" +
-						maturityDateCal.get(Calendar.DAY_OF_MONTH) + "/" +
-						maturityDateCal.get(Calendar.YEAR);
+				maturityDateCal.get(Calendar.YEAR) + "-" +
+						(maturityDateCal.get(Calendar.MONTH) + 1) + "-" +
+				maturityDateCal.get(Calendar.DAY_OF_MONTH);
 
 		return new Date(maturityDateString);
 	}
