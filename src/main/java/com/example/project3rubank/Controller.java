@@ -18,50 +18,32 @@ public class Controller {
 	private static final double MONEY_MARKET_MINIMUM = 2000.0;
 	private AccountDatabase accountDB;
 
-	@FXML
-	private TextField closeFName;
-	@FXML
-	private TextField closeLName;
-	@FXML
-	private DatePicker closeProfileDob;
-	@FXML
-	private Button closeByProfile;
-	@FXML
-	private DatePicker closeDate;
-	@FXML
-	private TextField closeAccountNumber;
-	@FXML
-	private Button closeByNumber;
-	@FXML
-	private HBox termBox;
-	@FXML
-	private Button openAccount;
-	@FXML
-	private Button clearFields;
-	@FXML
-	private TextField lName;
-	@FXML
-	private TextField fName;
-	@FXML
-	private DatePicker dobValue;
-	@FXML
-	private HBox campusBox;
-	@FXML
-	private CheckBox loyalCustomerCheckBox;
-	@FXML
-	private DatePicker cdDateOpen;
-	@FXML
-	private TextField initialDeposit;
-	@FXML
-	private Button exitButton;
-	@FXML
-	private ComboBox<AccountType> accountTypeComboBox;
-	@FXML
-	private ComboBox<Branch> branchComboBox;
-	@FXML
-	private ToggleGroup campusToggleGroup;
-	@FXML
-	private ToggleGroup termsToggleGroup;
+	@FXML private TextField accountNumber;
+	@FXML private TextField transactionAmount;
+	@FXML private Button deposit;
+	@FXML private Button withdraw;
+	@FXML private TextField closeFName;
+	@FXML private TextField closeLName;
+	@FXML private DatePicker closeProfileDob;
+	@FXML private Button closeByProfile;
+	@FXML private DatePicker closeDate;
+	@FXML private TextField closeAccountNumber;
+	@FXML private Button closeByNumber;
+	@FXML private HBox termBox;
+	@FXML private Button openAccount;
+	@FXML private Button clearFields;
+	@FXML private TextField lName;
+	@FXML private TextField fName;
+	@FXML private DatePicker dobValue;
+	@FXML private HBox campusBox;
+	@FXML private CheckBox loyalCustomerCheckBox;
+	@FXML private DatePicker cdDateOpen;
+	@FXML private TextField initialDeposit;
+	@FXML private Button exitButton;
+	@FXML private ComboBox<AccountType> accountTypeComboBox;
+	@FXML private ComboBox<Branch> branchComboBox;
+	@FXML private ToggleGroup campusToggleGroup;
+	@FXML private ToggleGroup termsToggleGroup;
 
 	private void hideElements(AccountType type) {
 		switch (type) {
@@ -435,9 +417,6 @@ public class Controller {
 		}
 	}
 
-
-
-
 	/**
 	 * This is a helper method for closing an account, where if a user closes a checking account, and they also have a savings account, it removes the loyal status.
 	 * @param accountDB the account database to traverse from
@@ -482,7 +461,6 @@ public class Controller {
 		}
 		return (balance * (rate / days_per_year) * day);
 	}
-
 
 	/**
 	 *
