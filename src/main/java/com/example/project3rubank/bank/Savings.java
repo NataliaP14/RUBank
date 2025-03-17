@@ -14,7 +14,7 @@ public class Savings extends Account {
 	public static final double LOYALTY_BONUS = 0.0025;
 	public static final double MONTHLY_INTEREST_RATE = ANNUAL_INTEREST_RATE / 12;
 	public static final double LOYAL_MONTHLY_INTEREST_RATE = (ANNUAL_INTEREST_RATE + LOYALTY_BONUS) / 12;
-	protected boolean isLoyal;
+	public boolean isLoyal;
 
 	/**
 	 * 	Constructor for a savings account with specified account number,
