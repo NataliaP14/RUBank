@@ -124,8 +124,8 @@
                             <TextField fx:id="transactionAmount" prefWidth="150.0" promptText="Amount" />
                         </HBox>
                         <HBox alignment="TOP_CENTER" spacing="15.0">
-                            <Button fx:id="deposit" mnemonicParsing="false" styleClass="success-button" text="Deposit" />
-                            <Button fx:id="withdraw" mnemonicParsing="false" styleClass="warning-button" text="Withdraw" />
+                            <Button fx:id="deposit" mnemonicParsing="false" styleClass="success-button" text="Deposit" onAction="#deposit"/>
+                            <Button fx:id="withdraw" mnemonicParsing="false" styleClass="warning-button" text="Withdraw" onAction="#withdraw"/>
                         </HBox>
                     </VBox>
                 </VBox>
