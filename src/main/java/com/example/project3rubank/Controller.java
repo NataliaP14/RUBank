@@ -85,42 +85,6 @@ public class Controller {
 	}
 
 	/**
-	 *
-	 */
-	public void initialize() {
-		accountDB = new AccountDatabase();
-		setUpButtons();
-		if (campusToggleGroup == null) { campusToggleGroup = new ToggleGroup();}
-		if (termsToggleGroup == null) { termsToggleGroup = new ToggleGroup();}
-		ObservableList<AccountType> types = FXCollections.observableArrayList(AccountType.values());
-		accountTypeComboBox.setItems(types);
-
-		accountTypeComboBox.setCellFactory(ListView -> new ListCell<AccountType>() {
-			@Override
-			protected void updateItem(AccountType type, boolean empty) {
-				super.updateItem(type, empty);
-				setText((empty || type == null) ? null : changeAccountTypeFormat(type));
-			}
-		});
-
-		accountTypeComboBox.setButtonCell(new ListCell<AccountType>() {
-			@Override
-			protected void updateItem(AccountType type, boolean empty) {
-				super.updateItem(type, empty);
-				setText((empty || type == null) ? null : changeAccountTypeFormat(type));
-			}
-		});
-
-		ObservableList<Branch> branches = FXCollections.observableArrayList(Branch.values());
-		branchComboBox.setItems(branches);
-
-		accountTypeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			hideElements(newValue);
-		});
-
-	}
-
-	/**
 	 * This method is the implementation of the O command, gets user input and validates it to open an account.
 	 * @param actionEvent
 	 *
@@ -202,10 +166,56 @@ public class Controller {
 			case CHECKING:
 				AccountNumber number = new AccountNumber(branch, type);
 				return new Checking(number, profile, initialDeposit);
-
+			case SAVINGS:
+				AccountNumber number1 = new AccountNumber(branch, type);
+				Savings savingsAcc =  new Savings(number1, profile, initialDeposit, isLoyal);
+				isLoyal = hasChecking(accountDB, profile);
+				if (isLoyal) { savingsAcc.setLoyal(true); }
+				return savingsAcc;
+			case MONEY_MARKET:
+				AccountNumber number2 = new AccountNumber(branch, type);
+				isLoyal = initialDeposit >= MONEY_MARKET_MINIMUM_FOR_LOYAL;
+				MoneyMarket moneyAcc = new MoneyMarket(number2, profile, initialDeposit, isLoyal);
+				if (isLoyal) { moneyAcc.setLoyal(true);}
+				return moneyAcc;
+			case COLLEGE_CHECKING:
+				RadioButton campusSelect = (RadioButton) campusToggleGroup.getSelectedToggle();
+				String campusText = campusSelect.getText(); Campus campus = null; campus = convertCampus(campusText);
+				CollegeChecking college = new CollegeChecking(null, profile, initialDeposit, campus);
+				boolean eligible = college.isEligible();
+				if (!eligible) { System.out.println("Not eligible to open: " + profile.getDateOfBirth() + " over 24."); return null; }
+				AccountNumber number3 = new AccountNumber(branch, type);
+				college = new CollegeChecking(number3, profile, initialDeposit, campus);
+				return college;
+			case CD:
+				Date open = new Date(cdDateOpen.getValue().toString());
+				CertificateDeposit cd = null;
+				if (open.compareTo(new Date()) > 0) { System.out.println("DOB invalid: " + open + " cannot be today or a future day."); return null; }
+				AccountNumber number4 = new AccountNumber(branch, type);
+				cd = new CertificateDeposit(number4, profile, initialDeposit, isLoyal, term, open);
+				return cd;
 		}
 		return null;
 	}
+
+	/**
+	 * Converts the campus from the user input to the enum value
+	 * @param campusInput the user input to convert
+	 * @return returns the correct campus relative to user input
+	 */
+	private Campus convertCampus(String campusInput) {
+		Campus campus = null;
+
+		if (campusInput.equalsIgnoreCase("New Brunswick")) {
+			campus = Campus.NEW_BRUNSWICK;
+		} else if (campusInput.equalsIgnoreCase("Newark")) {
+			campus = Campus.NEWARK;
+		} else if (campusInput.equalsIgnoreCase("Camden")) {
+			campus = Campus.CAMDEN;
+		}
+		return campus;
+	}
+
 
 	/**
 	 * This method is a helper method for creating an account and checks if a savings account being made has a checking account as well
@@ -249,9 +259,39 @@ public class Controller {
 		return null;
 	}
 
+	/**
+	 *
+	 */
+	public void initialize() {
+		accountDB = new AccountDatabase();
+		setUpButtons();
+		if (campusToggleGroup == null) { campusToggleGroup = new ToggleGroup();}
+		if (termsToggleGroup == null) { termsToggleGroup = new ToggleGroup();}
+		ObservableList<AccountType> types = FXCollections.observableArrayList(AccountType.values());
+		accountTypeComboBox.setItems(types);
 
+		accountTypeComboBox.setCellFactory(ListView -> new ListCell<AccountType>() {
+			@Override
+			protected void updateItem(AccountType type, boolean empty) {
+				super.updateItem(type, empty);
+				setText((empty || type == null) ? null : changeAccountTypeFormat(type));
+			}
+		});
 
+		accountTypeComboBox.setButtonCell(new ListCell<AccountType>() {
+			@Override
+			protected void updateItem(AccountType type, boolean empty) {
+				super.updateItem(type, empty);
+				setText((empty || type == null) ? null : changeAccountTypeFormat(type));
+			}
+		});
 
+		ObservableList<Branch> branches = FXCollections.observableArrayList(Branch.values());
+		branchComboBox.setItems(branches);
 
+		accountTypeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			hideElements(newValue);
+		});
 
+	}
 }
