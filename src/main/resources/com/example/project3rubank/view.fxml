@@ -16,6 +16,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -25,9 +26,12 @@
 
     <top>
         <VBox alignment="CENTER" styleClass="header-section">
+            <!-- Padding for the VBox -->
             <padding>
                 <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
             </padding>
+
+            <!-- Title Text -->
             <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="header-title" text="RU BANK">
                 <font>
                     <Font name="System Bold" size="24.0" />
@@ -67,33 +71,32 @@
                                 <DatePicker fx:id="dobValue" prefWidth="150.0" promptText="Date of Birth" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                             </HBox>
 
-
                             <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
-                                   <Label text="Campus:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
-                                   <HBox fx:id="campusBox" alignment="TOP_RIGHT" spacing="10">
-                                       <RadioButton text="New Brunswick">
-                              <toggleGroup>
-                                 <ToggleGroup fx:id="campusToggleGroup" />
-                              </toggleGroup></RadioButton>
-                                       <RadioButton text="Newark" toggleGroup="$campusToggleGroup" />
-                                       <RadioButton text="Camden" toggleGroup="$campusToggleGroup" />
-                                   </HBox>
+                                <Label text="Campus:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                <HBox fx:id="campusBox" alignment="TOP_RIGHT" spacing="10">
+                                    <RadioButton text="New Brunswick">
+                                        <toggleGroup>
+                                            <ToggleGroup fx:id="campusToggleGroup" />
+                                        </toggleGroup></RadioButton>
+                                    <RadioButton text="Newark" toggleGroup="$campusToggleGroup" />
+                                    <RadioButton text="Camden" toggleGroup="$campusToggleGroup" />
+                                </HBox>
                             </HBox>
                             <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
-                                   <Label text="Term:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
-                                   <HBox fx:id="termBox" spacing="10">
-                                       <RadioButton text="3">
-                              <toggleGroup>
-                                 <ToggleGroup fx:id="termsToggleGroup" />
-                              </toggleGroup></RadioButton>
-                                       <RadioButton text="6" toggleGroup="$termsToggleGroup" />
-                                       <RadioButton text="9" toggleGroup="$termsToggleGroup" />
-                                       <RadioButton text="12" toggleGroup="$termsToggleGroup" />
-                                   </HBox>
+                                <Label text="Term:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                                <HBox fx:id="termBox" spacing="10">
+                                    <RadioButton text="3">
+                                        <toggleGroup>
+                                            <ToggleGroup fx:id="termsToggleGroup" />
+                                        </toggleGroup></RadioButton>
+                                    <RadioButton text="6" toggleGroup="$termsToggleGroup" />
+                                    <RadioButton text="9" toggleGroup="$termsToggleGroup" />
+                                    <RadioButton text="12" toggleGroup="$termsToggleGroup" />
+                                </HBox>
                             </HBox>
                             <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
-                                   <CheckBox fx:id="loyalCustomerCheckBox" text="Loyal Customer" />
-                                   <DatePicker fx:id="cdDateOpen" prefWidth="150.0" promptText="CD Open Date" />
+                                <CheckBox fx:id="loyalCustomerCheckBox" text="Loyal Customer" />
+                                <DatePicker fx:id="cdDateOpen" prefWidth="150.0" promptText="CD Open Date" />
                             </HBox>
                             <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
                                 <Label text="Initial Deposit:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
@@ -105,12 +108,13 @@
                                 <Button fx:id="clearFields" mnemonicParsing="false" styleClass="secondary-button" text="Clear All Fields" />
                             </HBox>
                         </VBox>
-                  <columnConstraints>
+                        <columnConstraints>
+                            <ColumnConstraints />
                      <ColumnConstraints />
-                  </columnConstraints>
-                  <rowConstraints>
-                     <RowConstraints />
-                  </rowConstraints>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints />
+                        </rowConstraints>
                     </GridPane>
                 </VBox>
             </Tab>
@@ -198,7 +202,6 @@
                 <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
             </padding>
             <Pane HBox.hgrow="ALWAYS" />
-            <Button fx:id="exitButton" mnemonicParsing="false" styleClass="secondary-button" text="Exit" />
         </HBox>
     </bottom>
 </BorderPane>

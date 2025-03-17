@@ -1,13 +1,21 @@
 package com.example.project3rubank;
 
 import com.example.project3rubank.bank.*;
+import javafx.animation.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import com.example.project3rubank.util.Date;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.util.Duration;
+
+import java.security.Key;
+
 
 /**
  *
@@ -39,7 +47,6 @@ public class Controller {
 	@FXML private CheckBox loyalCustomerCheckBox;
 	@FXML private DatePicker cdDateOpen;
 	@FXML private TextField initialDeposit;
-	@FXML private Button exitButton;
 	@FXML private ComboBox<AccountType> accountTypeComboBox;
 	@FXML private ComboBox<Branch> branchComboBox;
 	@FXML private ToggleGroup campusToggleGroup;
@@ -86,14 +93,7 @@ public class Controller {
 
 
 	private void setUpButtons() {
-		exitButton.setOnAction(event -> {
-			exit();
-		});
-	}
 
-	@FXML
-	private void exit() {
-		System.exit(0);
 	}
 
 	/**
@@ -116,24 +116,24 @@ public class Controller {
 
 
 		if (firstName.isEmpty() || lastName.isEmpty() || type == null || branch == null || dobValue.getValue() == null) {
-			System.out.println("Fill in the required fields.");
+			notifications("Fill in the required fields.", false);
 			return;
 		}
 
 		Date dob = new Date(dobValue.getValue().toString());
 
 		if (!dob.isValid()) {
-			System.out.println("DOB invalid: " + dob + " not a valid calendar date!");
+			notifications("DOB invalid: " + dob + " not a valid calendar date!", false);
 			return;
 		}
 
 		if (dob.compareTo(new Date()) > 0) {
-			System.out.println("DOB invalid: " + dob + " cannot be today or a future day.");
+			notifications("DOB invalid: " + dob + " cannot be today or a future day.", false);
 			return;
 		}
 
 		if (!dob.isAdult()) {
-			System.out.println("Not eligible to open: " + dob + " under 18.");
+			notifications("Not eligible to open: " + dob + " under 18.", false);
 			return;
 		}
 
@@ -144,22 +144,22 @@ public class Controller {
 		try {
 			initialDeposit = Double.parseDouble(amountStr);
 		} catch (NumberFormatException e) {
-			System.out.println("For input string: \"" + amountStr + "\" - not a valid amount.");
+			notifications("For input string: \"" + amountStr + "\" - not a valid amount.", false);
 			return;
 		}
 
 		if (type == AccountType.CD && term == null) {
-			System.out.println("Missing term for CD Account");
+			notifications("Missing term for CD Account", false);
 			return;
 		}
 		if (type == AccountType.CD && cdDateOpen.getValue() == null) {
-			System.out.println("Missing opening date for CD account");
+			notifications("Missing opening date for CD account", false);
 			return;
 		}
 
 		RadioButton campusSelect = (RadioButton) campusToggleGroup.getSelectedToggle();
 		if (type == AccountType.COLLEGE_CHECKING && campusSelect == null) {
-			System.out.println("Missing campus for college account");
+			notifications("Missing campus for college account", false);
 			return;
 		}
 
@@ -175,21 +175,21 @@ public class Controller {
 
 		Account duplicateAccount = findDuplicateAccount(accountDB, profile, type, termNumber);
 		if (duplicateAccount != null && accountDB.contains(duplicateAccount)) {
-			System.out.println(firstName + " " + lastName + " already has a " + type + " account.");
+			notifications(firstName + " " + lastName + " already has a " + type + " account.", false);
 			return;
 		}
 
 		if (type == AccountType.MONEY_MARKET && initialDeposit < MONEY_MARKET_MINIMUM) {
-			System.out.println("Minimum of $2,000 to open a Money Market account.");
+			notifications("Minimum of $2,000 to open a Money Market account.", false);
 			return;
 		}
 		if (type == AccountType.CD && initialDeposit < CertificateDeposit.MIN_BALANCE) {
-			System.out.println("Minimum of $1,000 to open a Certificate Deposit account.");
+			notifications("Minimum of $1,000 to open a Certificate Deposit account.", false);
 			return;
 		}
 
 		if (initialDeposit <= 0) {
-			System.out.println("Initial deposit cannot be 0 or negative.");
+			notifications("Initial deposit cannot be 0 or negative.", false);
 			return;
 		}
 
@@ -198,7 +198,7 @@ public class Controller {
 			return;
 		}
 		accountDB.add(account);
-		System.out.println(type + " account " + account.getNumber() + " has been opened.");
+		notifications(type + " account " + account.getNumber() + " has been opened.", true);
 	}
 
 	/**
@@ -242,7 +242,7 @@ public class Controller {
 				CollegeChecking college = new CollegeChecking(null, profile, initialDeposit, campus);
 				boolean eligible = college.isEligible();
 				if (!eligible) {
-					System.out.println("Not eligible to open: " + profile.getDateOfBirth() + " over 24.");
+					notifications("Not eligible to open: " + profile.getDateOfBirth() + " over 24.", false);
 					return null;
 				}
 				AccountNumber number3 = new AccountNumber(branch, type);
@@ -252,7 +252,7 @@ public class Controller {
 				Date open = new Date(cdDateOpen.getValue().toString());
 				CertificateDeposit cd = null;
 				if (open.compareTo(new Date()) > 0) {
-					System.out.println("DOB invalid: " + open + " cannot be today or a future day.");
+					notifications("DOB invalid: " + open + " cannot be today or a future day.", false);
 					return null;
 				}
 				AccountNumber number4 = new AccountNumber(branch, type);
@@ -309,7 +309,6 @@ public class Controller {
 	 */
 	private Account findDuplicateAccount(AccountDatabase accountDB, Profile profile, AccountType type, int term) {
 		for (int i = 0; i < accountDB.size(); i++) {
-			//System.out.println("Checking account: " + accountDB.get(i).getHolder().getFirstName() + " " + accountDB.get(i).getHolder().getLastName() + " Type: " + accountDB.get(i).getNumber().getType());
 			if (accountDB.get(i).getNumber().getType() == AccountType.CD && type == AccountType.CD) {
 				CertificateDeposit cdAcc = (CertificateDeposit) accountDB.get(i);
 				if (accountDB.get(i).getHolder().equals(profile) &&
@@ -326,10 +325,14 @@ public class Controller {
 		return null;
 	}
 
+	/**
+	 *
+	 * @param actionEvent
+	 */
 	@FXML
 	private void closeAccountByNumber(ActionEvent actionEvent) {
 		if (closeDate.getValue() == null || closeAccountNumber.getText().trim().isEmpty()) {
-			System.out.println("Fill in the required fields.");
+			notifications("Fill in the required fields.", false);
 			return;
 		}
 		Date close = new Date(closeDate.getValue().toString());
@@ -339,23 +342,24 @@ public class Controller {
 		Profile holder = null;
 		boolean closedChecking = false;
 		boolean found = false;
+		StringBuilder print = new StringBuilder();
 		for (int i = 0; i < accountDB.size(); i++) {
 			Account account = accountDB.get(i);
 			if (account.getNumber().toString().equals(number)) {
 				found = true;
-				System.out.println("Closing account " + account.getNumber().toString());
+				print.append("Closing account ").append(account.getNumber().toString()).append("\n");
 				if (account.getNumber().getType() != AccountType.CD) {
 					interest = calculateInterestClosing(account, close);
-					System.out.println("--interest earned: $" + String.format("%,.2f", interest));
+					print.append("--interest earned: $").append(String.format("%,.2f", interest)).append("\n");
 				} else {
 					CertificateDeposit cd = (CertificateDeposit) account;
 					interest = cd.calculateClosingInterest(close);
 					if (close.compareTo(cd.getMaturityDate()) < 0) {
 						penalty = cd.calculatePenalty(close);
-						System.out.println("--interest earned: $" + String.format("%,.2f", interest));
-						System.out.println("--penalty: $" + String.format("%,.2f", penalty));
+						print.append("--interest earned: $").append(String.format("%,.2f", interest)).append("\n");
+						print.append("--penalty: $").append(String.format("%,.2f", penalty)).append("\n");
 					} else {
-						System.out.println("--interest earned: $" + String.format("%,.2f", interest));
+						print.append("--interest earned: $").append(String.format("%,.2f", interest)).append("\n");
 					}
 				}
 				if (account.getNumber().getType() == AccountType.CHECKING) {
@@ -364,23 +368,29 @@ public class Controller {
 				}
 				accountDB.getArchive().add(account, close);
 				accountDB.remove(account);
+				alert(print.toString(), true);
 				if (closedChecking && holder != null) {
 					removeLoyalStatus(accountDB, holder);
 				}
 				return;
 			}
 		}
-		System.out.println(number + " account does not exist.");
+		notifications(number + " account does not exist.", false);
 	}
 
+	/**
+	 *
+	 * @param actionEvent
+	 */
 	@FXML
 	private void closeAllAccounts(ActionEvent actionEvent) {
 		Date close = new Date(closeDate.getValue().toString());
 		String fName = closeFName.getText().trim();
 		String lName = closeLName.getText().trim();
 		Date dob = new Date(closeProfileDob.getValue().toString());
+		StringBuilder print = new StringBuilder();
 		if (closeDate.getValue() == null || fName.isEmpty() || lName.isEmpty() || closeProfileDob.getValue() == null) {
-			System.out.println("FIll in the required fields.");
+			notifications("Fill in the required fields.", false);
 			return;
 		}
 		double interest = 0;
@@ -393,27 +403,28 @@ public class Controller {
 					&& account.getHolder().getLastName().equalsIgnoreCase(lName)
 					&& account.getHolder().getDateOfBirth().equals(new Date(closeProfileDob.getValue().toString()))) {
 				if (!found) {
-					System.out.println("Closing accounts for " + fName + " " + lName + " " + dob);
+					print.append("Closing accounts for ").append(fName).append(" ").append(lName).append(" ").append(dob).append("\n");
 					found = true;
 				}
 				if (account.getNumber().getType() == AccountType.CD) {
 					CertificateDeposit cd = (CertificateDeposit) account;
 					interest = cd.calculateClosingInterest(close);
 					penalty = cd.calculatePenalty(close);
-					System.out.println("--" + account.getNumber() + " interest earned: " + String.format("$%,.2f", interest));
-					System.out.println("  [penalty] $" + String.format("%,.2f", penalty));
+					print.append("--").append(account.getNumber()).append(" interest earned: ").append(String.format("$%,.2f", interest)).append("\n");
+					print.append("  [penalty] $").append(String.format("%,.2f", penalty)).append("\n");
 				} else {
 					interest = calculateInterestClosing(account, close);
-					System.out.println("--" + account.getNumber() + " interest earned: " + String.format("$%,.2f", interest));
+					print.append("--").append(account.getNumber()).append(" interest earned: ").append(String.format("$%,.2f", interest)).append("\n");
 				}
 				accountDB.getArchive().add(account, close);
 				accountDB.remove(account);
 			}
 		}
 		if (!found) {
-			System.out.println(fName + " " + lName + " " + dob + " does not have any accounts in the database.");
+			notifications(fName + " " + lName + " " + dob + " does not have any accounts in the database.", false);
 		} else {
-			System.out.println("All accounts for " + fName + " " + lName + " " + dob + " are closed and moved to archive.");
+			print.append("All accounts for ").append(fName).append(" ").append(lName).append(" ").append(dob).append(" are closed and moved to archive.").append("\n");
+			alert(print.toString(), true);
 		}
 	}
 
@@ -460,6 +471,69 @@ public class Controller {
 			rate = CollegeChecking.ANNUAL_INTEREST_RATE;
 		}
 		return (balance * (rate / days_per_year) * day);
+	}
+
+	/**
+	 *
+	 * @param message
+	 * @param success
+	 */
+	private void notifications(String message, boolean success) {
+		Label label = new Label(message);
+		label.setPadding(new Insets(10));
+		label.setStyle("-fx-background-color: " + (success ? "#4CAF50" : "#f44336") + "; -fx-text-fill: white;");
+
+		StackPane notification = new StackPane(label);
+		notification.setAlignment(Pos.TOP_RIGHT);
+		notification.setPadding(new Insets(10));
+		notification.setMouseTransparent(true);
+
+		BorderPane root = (BorderPane) openAccount.getScene().getRoot();
+
+		StackPane notificationContainer = (StackPane) root.lookup("#notificationContainer");
+		if (notificationContainer == null) {
+			notificationContainer = new StackPane();
+			notificationContainer.setId("notificationContainer");
+			root.setBottom(notificationContainer);
+		}
+
+		notificationContainer.getChildren().add(notification);
+
+		notification.setTranslateX(200);
+		Timeline timeline = new Timeline();
+		KeyValue keyValue = new KeyValue(notification.translateXProperty(), 0, Interpolator.EASE_IN);
+		KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.5), keyValue);
+		timeline.getKeyFrames().add(keyFrame);
+		timeline.play();
+
+		FadeTransition fade = new FadeTransition(Duration.seconds(2), label);
+		fade.setFromValue(1.0);
+		fade.setToValue(0.0);
+
+		StackPane finalNotificationContainer = notificationContainer;
+		fade.setOnFinished(e -> {
+
+			PauseTransition delay = new PauseTransition(Duration.seconds(0.5));
+			delay.setOnFinished(f -> finalNotificationContainer.getChildren().remove(notification));
+			delay.play();
+		});
+
+		PauseTransition delay = new PauseTransition(Duration.seconds(2));
+		delay.setOnFinished(e -> fade.play());
+		delay.play();
+	}
+
+	/**
+	 *
+	 * @param message
+	 * @param success
+	 */
+	private void alert(String message, boolean success) {
+		Alert alert = new Alert(success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR);
+		alert.setTitle(success ? "Success" : "Error");
+		alert.setHeaderText("Closing Account");
+		alert.setContentText(message);
+		alert.showAndWait();
 	}
 
 	/**
