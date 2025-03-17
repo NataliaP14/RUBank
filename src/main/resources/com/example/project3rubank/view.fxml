@@ -102,8 +102,8 @@
                             </HBox>
 
                             <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
-                                <Button fx:id="openAccountButton" onAction="#openAccount" mnemonicParsing="false" styleClass="primary-button" text="Open Account" />
-                                <Button fx:id="clearFieldsButton" mnemonicParsing="false" styleClass="secondary-button" text="Clear All Fields" />
+                                <Button fx:id="openAccount" onAction="#openAccount" mnemonicParsing="false" styleClass="primary-button" text="Open Account" />
+                                <Button fx:id="clearFields" mnemonicParsing="false" styleClass="secondary-button" text="Clear All Fields" />
                             </HBox>
                         </VBox>
                   <columnConstraints>
@@ -124,15 +124,15 @@
                         <Text styleClass="section-title" text="Close Account" />
 
                         <VBox alignment="TOP_CENTER" spacing="15.0">
-                            <DatePicker fx:id="closeDatePicker" prefWidth="200.0" promptText="Close Date" />
+                            <DatePicker fx:id="closeDate" prefWidth="200.0" promptText="Close Date" />
                             <TabPane tabClosingPolicy="UNAVAILABLE">
                                 <Tab text="By Account Number">
                                     <VBox alignment="TOP_CENTER" spacing="15.0">
                                         <padding>
                                             <Insets bottom="10.0" top="10.0" />
                                         </padding>
-                                        <TextField fx:id="closeAccountNumberField" prefHeight="27.0" prefWidth="242.0" promptText="Account Number" />
-                                        <Button fx:id="closeByNumberButton" mnemonicParsing="false" styleClass="danger-button" text="Close Account" />
+                                        <TextField fx:id="closeAccountNumber" prefHeight="27.0" prefWidth="242.0" promptText="Account Number" />
+                                        <Button fx:id="closeByNumber" onAction="#closeAccountByNumber" mnemonicParsing="false" styleClass="danger-button" text="Close Account" />
                                     </VBox>
                                 </Tab>
                                 <Tab text="By Profile">
@@ -141,12 +141,12 @@
                                             <Insets bottom="10.0" top="10.0" />
                                         </padding>
                                         <HBox spacing="15.0">
-                                            <TextField fx:id="closeFirstNameField" prefHeight="27.0" prefWidth="473.0" promptText="First Name" />
+                                            <TextField fx:id="closeFName" prefHeight="27.0" prefWidth="473.0" promptText="First Name" />
                                         </HBox>
-                                         <TextField fx:id="closeLastNameField" prefHeight="27.0" prefWidth="235.0" promptText="Last Name" />
+                                         <TextField fx:id="closeLName" prefHeight="27.0" prefWidth="235.0" promptText="Last Name" />
                               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="DOB:" />
-                                         <DatePicker fx:id="closeProfileDobPicker" prefWidth="150.0" promptText="Date of Birth" />
-                                        <Button fx:id="closeByProfileButton" mnemonicParsing="false" styleClass="danger-button" text="Close All Accounts" />
+                                         <DatePicker fx:id="closeProfileDob" prefWidth="150.0" promptText="Date of Birth" />
+                                        <Button fx:id="closeByProfile" onAction="#closeAllAccounts" mnemonicParsing="false" styleClass="danger-button" text="Close All Accounts" />
                                     </VBox>
                                 </Tab>
                             </TabPane>
@@ -159,12 +159,12 @@
                         <Text styleClass="section-title" text="Withdraw/Deposit" textAlignment="JUSTIFY" />
                         <VBox alignment="TOP_CENTER" spacing="15.0">
                             <HBox spacing="15.0">
-                                <TextField fx:id="transactionAccountField" prefWidth="200.0" promptText="Account Number" />
-                                <TextField fx:id="transactionAmountField" prefWidth="150.0" promptText="Amount" />
+                                <TextField fx:id="accountNumber" prefWidth="200.0" promptText="Account Number" />
+                                <TextField fx:id="transactionAmount" prefWidth="150.0" promptText="Amount" />
                             </HBox>
                             <HBox alignment="TOP_CENTER" spacing="15.0">
-                                <Button fx:id="depositButton" mnemonicParsing="false" styleClass="success-button" text="Deposit" />
-                                <Button fx:id="withdrawButton" mnemonicParsing="false" styleClass="warning-button" text="Withdraw" />
+                                <Button fx:id="deposit" mnemonicParsing="false" styleClass="success-button" text="Deposit" />
+                                <Button fx:id="withdraw" mnemonicParsing="false" styleClass="warning-button" text="Withdraw" />
                             </HBox>
                         </VBox>
                     </VBox>
