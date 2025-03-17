@@ -1,16 +1,205 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.project3rubank.Controller">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project3rubank.Controller">
+
+    <top>
+        <VBox alignment="CENTER" styleClass="header-section">
+            <padding>
+                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+            </padding>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="header-title" text="RU BANK">
+                <font>
+                    <Font name="System Bold" size="24.0" />
+                </font>
+            </Text>
+        </VBox>
+    </top>
+
+
+    <center>
+        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <Tab text="Open Account">
+                <VBox alignment="TOP_CENTER" spacing="15.0">
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+
+
+                    <GridPane alignment="TOP_CENTER" styleClass="section-title">
+                        <VBox alignment="CENTER" spacing="15.0">
+                            <HBox alignment="TOP_CENTER" spacing="15.0">
+                                <ComboBox fx:id="accountTypeComboBox" prefWidth="150.0" promptText="Account Type" />
+                                <ComboBox fx:id="branchComboBox" prefWidth="150.0" promptText="Branch" />
+                            </HBox>
+
+                            <HBox alignment="TOP_CENTER" spacing="15.0">
+                                <Label text="First Name:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                <TextField fx:id="fName" prefWidth="150.0" promptText="First Name" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                            </HBox>
+                            <HBox alignment="TOP_CENTER" spacing="15.0">
+                                <Label text="Last Name:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                <TextField fx:id="lName" prefWidth="150.0" promptText="Last Name"  />
+                            </HBox>
+
+                            <HBox alignment="TOP_CENTER" spacing="15.0">
+                                <Label text="Date Of Birth:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                <DatePicker fx:id="dobValue" prefWidth="150.0" promptText="Date of Birth" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                            </HBox>
+
+
+                            <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                   <Label text="Campus:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                   <HBox fx:id="campusBox" alignment="TOP_RIGHT" spacing="10">
+                                       <RadioButton text="New Brunswick">
+                              <toggleGroup>
+                                 <ToggleGroup fx:id="campusToggleGroup" />
+                              </toggleGroup></RadioButton>
+                                       <RadioButton text="Newark" toggleGroup="$campusToggleGroup" />
+                                       <RadioButton text="Camden" toggleGroup="$campusToggleGroup" />
+                                   </HBox>
+                            </HBox>
+                            <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                   <Label text="Term:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                                   <HBox fx:id="termBox" spacing="10">
+                                       <RadioButton text="3">
+                              <toggleGroup>
+                                 <ToggleGroup fx:id="termsToggleGroup" />
+                              </toggleGroup></RadioButton>
+                                       <RadioButton text="6" toggleGroup="$termsToggleGroup" />
+                                       <RadioButton text="9" toggleGroup="$termsToggleGroup" />
+                                       <RadioButton text="12" toggleGroup="$termsToggleGroup" />
+                                   </HBox>
+                            </HBox>
+                            <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                   <CheckBox fx:id="loyalCustomerCheckBox" text="Loyal Customer" />
+                                   <DatePicker fx:id="cdDateOpen" prefWidth="150.0" promptText="CD Open Date" />
+                            </HBox>
+                            <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                <Label text="Initial Deposit:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                <TextField fx:id="initialDeposit" prefWidth="150.0" promptText="Initial Deposit" />
+                            </HBox>
+
+                            <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                <Button fx:id="openAccountButton" onAction="#openAccount" mnemonicParsing="false" styleClass="primary-button" text="Open Account" />
+                                <Button fx:id="clearFieldsButton" mnemonicParsing="false" styleClass="secondary-button" text="Clear All Fields" />
+                            </HBox>
+                        </VBox>
+                  <columnConstraints>
+                     <ColumnConstraints />
+                  </columnConstraints>
+                  <rowConstraints>
+                     <RowConstraints />
+                  </rowConstraints>
+                    </GridPane>
+                </VBox>
+            </Tab>
+
+            <Tab text="Close or Withdraw/Deposit">
+                <HBox alignment="CENTER" spacing="15.0">
+
+                    <VBox alignment="TOP_CENTER" prefWidth="450.0" spacing="15.0" VBox.vgrow="ALWAYS">
+
+                        <Text styleClass="section-title" text="Close Account" />
+
+                        <VBox alignment="TOP_CENTER" spacing="15.0">
+                            <DatePicker fx:id="closeDatePicker" prefWidth="200.0" promptText="Close Date" />
+                            <TabPane tabClosingPolicy="UNAVAILABLE">
+                                <Tab text="By Account Number">
+                                    <VBox alignment="TOP_CENTER" spacing="15.0">
+                                        <padding>
+                                            <Insets bottom="10.0" top="10.0" />
+                                        </padding>
+                                        <TextField fx:id="closeAccountNumberField" prefHeight="27.0" prefWidth="242.0" promptText="Account Number" />
+                                        <Button fx:id="closeByNumberButton" mnemonicParsing="false" styleClass="danger-button" text="Close Account" />
+                                    </VBox>
+                                </Tab>
+                                <Tab text="By Profile">
+                                    <VBox spacing="15.0">
+                                        <padding>
+                                            <Insets bottom="10.0" top="10.0" />
+                                        </padding>
+                                        <HBox spacing="15.0">
+                                            <TextField fx:id="closeFirstNameField" prefHeight="27.0" prefWidth="473.0" promptText="First Name" />
+                                        </HBox>
+                                         <TextField fx:id="closeLastNameField" prefHeight="27.0" prefWidth="235.0" promptText="Last Name" />
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="DOB:" />
+                                         <DatePicker fx:id="closeProfileDobPicker" prefWidth="150.0" promptText="Date of Birth" />
+                                        <Button fx:id="closeByProfileButton" mnemonicParsing="false" styleClass="danger-button" text="Close All Accounts" />
+                                    </VBox>
+                                </Tab>
+                            </TabPane>
+                        </VBox>
+                    </VBox>
+               <Line endX="100.65682983398438" endY="69.37884521484375" startX="100.98524475097656" startY="-810.5672607421875" />
+
+
+                    <VBox alignment="TOP_CENTER" prefWidth="450.0" spacing="15.0" VBox.vgrow="ALWAYS">
+                        <Text styleClass="section-title" text="Withdraw/Deposit" textAlignment="JUSTIFY" />
+                        <VBox alignment="TOP_CENTER" spacing="15.0">
+                            <HBox spacing="15.0">
+                                <TextField fx:id="transactionAccountField" prefWidth="200.0" promptText="Account Number" />
+                                <TextField fx:id="transactionAmountField" prefWidth="150.0" promptText="Amount" />
+                            </HBox>
+                            <HBox alignment="TOP_CENTER" spacing="15.0">
+                                <Button fx:id="depositButton" mnemonicParsing="false" styleClass="success-button" text="Deposit" />
+                                <Button fx:id="withdrawButton" mnemonicParsing="false" styleClass="warning-button" text="Withdraw" />
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </HBox>
+            </Tab>
+
+
+            <Tab text="Account Database">
+                <VBox spacing="15.0">
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+
+                    <HBox spacing="10.0">
+                        <Button fx:id="printByBranchButton" mnemonicParsing="false" styleClass="info-button" text="Print By Branch" />
+                        <Button fx:id="printByTypeButton" mnemonicParsing="false" styleClass="info-button" text="Print By Type" />
+                        <Button fx:id="printByHolderButton" mnemonicParsing="false" styleClass="info-button" text="Print By Holder" />
+                        <Button fx:id="printStatementsButton" mnemonicParsing="false" styleClass="info-button" text="Print Statements" />
+                        <Button fx:id="printArchiveButton" mnemonicParsing="false" styleClass="info-button" text="Print Archive" />
+                        <Button fx:id="LoadAccountsButton" mnemonicParsing="false" styleClass="info-button" text="Load Accounts From File" />
+                        <Button fx:id="LoadActivitiesButton" mnemonicParsing="false" styleClass="info-button" text="Load Activities From File" />
+                    </HBox>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </center>
+
+
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="status-bar">
+            <padding>
+                <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+            </padding>
+            <Pane HBox.hgrow="ALWAYS" />
+            <Button fx:id="exitButton" mnemonicParsing="false" styleClass="secondary-button" text="Exit" />
+        </HBox>
+    </bottom>
+</BorderPane>

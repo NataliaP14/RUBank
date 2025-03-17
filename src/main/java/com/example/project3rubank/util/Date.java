@@ -33,11 +33,11 @@ public class Date implements Comparable<Date> {
      * @param date passes the date as a string
      */
     public Date(String date) {
-        String[] dateSplit = date.split("/");
+        String[] dateSplit = date.split("-");
 
-        this.month = Integer.parseInt(dateSplit[0]);
-        this.day = Integer.parseInt(dateSplit[1]);
-        this.year = Integer.parseInt(dateSplit[2]);
+        this.year = Integer.parseInt(dateSplit[0]);
+        this.month = Integer.parseInt(dateSplit[1]);
+        this.day = Integer.parseInt(dateSplit[2]);
     }
 
     /**
