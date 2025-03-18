@@ -288,7 +288,7 @@ public class Controller {
 	 * Converts the campus from the user input to the enum value
 	 *
 	 * @param campusInput the user input to convert
-	 * @return returns the correct campus relative to user input
+	 * @return returns the correct campus relative to user input.
 	 */
 	private Campus convertCampus(String campusInput) {
 		Campus campus = null;
