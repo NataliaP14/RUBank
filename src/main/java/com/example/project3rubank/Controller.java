@@ -381,7 +381,7 @@ public class Controller {
 		String amountString = transactionAmount.getText().trim();
 
 		if(accNumber.isEmpty() || amountString.isEmpty()) {
-			System.out.println("Please fill in both fields.");
+			notifications("Please fill in both fields.", false);
 			return;
 		}
 
@@ -389,17 +389,21 @@ public class Controller {
 
 		try {
 			amount = Double.parseDouble(amountString);
-			if (amount <= 0) { System.out.println(amount + " - deposit amount cannot be 0 or negative."); return; }
+			if (amount <= 0) {
+				notifications(String.format("%,.2f - deposit amount cannot be 0 or negative.", amount), false);
+				return; }
 		} catch(NumberFormatException e) {
-			System.out.println("For input string: \"" + amountString + "\" - not a valid amount."); return;
+			notifications(String.format("For input string: \" %s \" - not a valid amount.", amountString), false);
+			return;
 		}
 		boolean accountFound = false;
 
 		for (int i = 0; i < accountDB.size(); i++) {
 			if (accountDB.get(i).getNumber().toString().equals(accNumber)) { accountFound = true;
+
 				accountDB.deposit(accountDB.get(i).getNumber(), amount);
-				System.out.println("$" + String.format("%,.2f", amount) +
-						" deposited to " + accNumber);
+				notifications(String.format("$" + String.format("%,.2f", amount) +
+						" deposited to " + accNumber), true);
 
 				if (accountDB.get(i).getNumber().getType() == AccountType.MONEY_MARKET) {
 					MoneyMarket moneyAcc = (MoneyMarket) accountDB.get(i);
@@ -412,7 +416,7 @@ public class Controller {
 				break;
 			}
 		}
-		if (!accountFound) { System.out.println(accNumber + " does not exist."); }
+		if (!accountFound) { notifications(String.format(accNumber + " does not exist."), false); }
 
 	}
 
@@ -428,7 +432,7 @@ public class Controller {
 		String amountString = transactionAmount.getText().trim();
 
 		if(accNumber.isEmpty() || amountString.isEmpty()) {
-			System.out.println("Please fill in both fields.");
+			notifications("Please fill in both fields.", false);
 			return;
 		}
 
@@ -437,11 +441,11 @@ public class Controller {
 		try {
 			amount = Double.parseDouble(amountString);
 			if(amount <= 0){
-				System.out.println(amountString + " withdrawal amount cannot be 0 or negative.");
+				notifications(String.format(amountString + " withdrawal amount cannot be 0 or negative."), false);
 				return;
 			}
 		} catch (NumberFormatException e) {
-			System.out.println("For input string: \"" + amountString + "\" - not a valid amount.");
+			notifications(String.format("For input string: \"" + amountString + "\" - not a valid amount."), false);
 			return;
 		}
 
@@ -461,13 +465,16 @@ public class Controller {
 						moneyAcc.incrementWithdrawals();
 
 						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
-							System.out.print(accNumber + " balance below $2,000 - ");
+							notifications(String.format("%s balance below $2,000 - ", accNumber), false);
 							if (amount <= accountDB.get(i).getBalance()) {
-								System.out.println("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber);
+
+								notifications(String.format("$%,.2f withdrawn from %s",amount, accNumber), true);
 							}
 						}
 						else {
-								if (amount <= accountDB.get(i).getBalance()) { System.out.println("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber); }
+								if (amount <= accountDB.get(i).getBalance()) {
+									notifications(String.format("$%,.2f withdrawn from %s",amount, accNumber), true);
+								}
 						}
 
 						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM_FOR_LOYAL) {
@@ -475,21 +482,23 @@ public class Controller {
 						}
 						return;
 					}
-					System.out.println("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber);
+					notifications(String.format("$%,.2f withdrawn from %s",amount, accNumber), true);
 					return;
 				}
 				if (amount > accountDB.get(i).getBalance() && accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
-					System.out.println(accNumber + " balance below $2,000 - " + "withdrawing $" + String.format("%,.2f", amount) + " - insufficient funds.");
+					notifications(String.format("%s balance below $2,000 - withdrawing $%,.2f - insufficient funds.", accNumber, amount), false);
 					return;
 				}
 				else if (amount > accountDB.get(i).getBalance()) {
-					System.out.println(accNumber + " - insufficient funds.");
+					notifications(String.format("%s - insufficient funds.", accNumber), false);
 					return;
 				}
 				break;
 			}
 		}
-		if(!accountFound) { System.out.println(accNumber + " does not exist."); }
+		if(!accountFound) {
+			notifications(String.format("%s does not exist.", accNumber), false);
+		}
 	}
 
 
