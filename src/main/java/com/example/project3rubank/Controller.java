@@ -17,7 +17,7 @@ import javafx.geometry.Pos;
 import javafx.util.Duration;
 
 import java.security.Key;
-import java.util.StringTokenizer;
+
 
 
 /**
@@ -59,6 +59,7 @@ public class Controller {
 	@FXML private ComboBox<Branch> branchComboBox;
 	@FXML private ToggleGroup campusToggleGroup;
 	@FXML private ToggleGroup termsToggleGroup;
+	@FXML private TextArea outputTextArea;
 
 	private void hideElements(AccountType type) {
 		switch (type) {
@@ -621,9 +622,9 @@ public class Controller {
 	@FXML
 	private void printByBranch(ActionEvent actionEvent) {
 		if(accountDB != null) {
-			accountDB.printByBranch();
+			outputTextArea.setText(accountDB.printByBranch());
 		} else {
-			System.out.println("Database is empty.");
+			outputTextArea.setText("Database is empty.");
 		}
 	}
 
@@ -633,9 +634,9 @@ public class Controller {
 	@FXML
 	private void printByType(ActionEvent actionEvent) {
 		if(accountDB != null) {
-			accountDB.printByType();
+			outputTextArea.setText(accountDB.printByType());
 		} else {
-			System.out.println("Database is empty.");
+			outputTextArea.setText("Database is empty.");
 		}
 	}
 
@@ -647,9 +648,9 @@ public class Controller {
 	@FXML
 	private void printByHolder(ActionEvent actionEvent) {
 		if(accountDB != null) {
-			accountDB.printByHolder();
+			outputTextArea.setText(accountDB.printByHolder());
 		} else {
-			System.out.println("Database is empty.");
+			outputTextArea.setText("Database is empty.");
 		}
 	}
 
@@ -660,9 +661,9 @@ public class Controller {
 	@FXML
 	private void printStatements(ActionEvent actionEvent) {
 		if(accountDB != null) {
-			accountDB.printStatements();
+			outputTextArea.setText(accountDB.printStatements());
 		} else {
-			System.out.println("Database is empty.");
+			outputTextArea.setText("Database is empty.");
 		}
 	}
 
@@ -672,9 +673,9 @@ public class Controller {
 	@FXML
 	private void printArchive(ActionEvent actionEvent) {
 		if(accountDB != null) {
-			accountDB.printArchive();
+			outputTextArea.setText(accountDB.printArchive());
 		} else {
-			System.out.println("Archive is empty");
+			outputTextArea.setText("Archive is empty");
 		}
 	}
 

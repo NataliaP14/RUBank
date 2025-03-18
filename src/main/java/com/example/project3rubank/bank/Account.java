@@ -43,9 +43,13 @@ public abstract class Account implements Comparable<Account> {
      * @param interest  Calculated interest amount.
      * @param fee       Calculated fee amount.
      */
-    private void printBalance(double interest, double fee) {
+    private String printBalance(double interest, double fee) {
+        StringBuilder print = new StringBuilder();
+
         balance += interest - fee;
-        System.out.printf("\n\t[Balance] $%,.2f\n", balance);
+        print.append(String.format("\n\t[Balance] $%,.2f\n", balance));
+
+        return print.toString();
     }
 
     /**
@@ -54,19 +58,28 @@ public abstract class Account implements Comparable<Account> {
      * @param interest  Calculated interest.
      * @param fee       Calculated fees.
      */
-    private void printInterestFee(double interest, double fee) {
-        System.out.printf("\t[interest] $%,.2f [Fee] $%,.2f", interest, fee);
+    private String printInterestFee(double interest, double fee) {
+        StringBuilder print = new StringBuilder();
+
+        print.append(String.format("\t[interest] $%,.2f [Fee] $%,.2f", interest, fee));
+
+        return print.toString();
     }
 
     /**
      * Prints all the activities recorded for the account.
+     *
+     * @return
      */
-    private void printActivities() {
-        if (activities.isEmpty()) return;
-        System.out.println("\t[Activity]");
+    private String printActivities() {
+        StringBuilder print = new StringBuilder();
+
+        if (activities.isEmpty()) return "";
+        print.append("\t[Activity]");
             for(Activity activity: activities) {
-                System.out.println("\t\t" + activity);
+                print.append("\t\t").append(activity).append("\n");
             }
+        return print.toString();
     }
 
     /**
@@ -98,15 +111,20 @@ public abstract class Account implements Comparable<Account> {
 
 
     /**
-     *  Template method that generates a statement for an account to display
-     *  the account activities, interest and fees.
+     * Template method that generates a statement for an account to display
+     * the account activities, interest and fees.
+     *
+     * @return
      */
-    public final void statement() {
-        printActivities();
+    public final String statement() {
+        StringBuilder print = new StringBuilder();
+
+        print.append(printActivities());
         double interest = interest();
         double fee = fee();
-        printInterestFee(interest, fee);
-        printBalance(interest, fee);
+        print.append(printInterestFee(interest, fee));
+        print.append(printBalance(interest, fee));
+        return print.toString();
     }
 
     /**

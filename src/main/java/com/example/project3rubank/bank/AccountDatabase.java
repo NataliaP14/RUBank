@@ -42,17 +42,21 @@ public class AccountDatabase extends List<Account> {
     /**
      * This method prints the archive from the archive class.
      */
-    public void printArchive() {
-        archive.print();
+    public String printArchive() {
+        StringBuilder print = new StringBuilder();
+        print.append(archive.print());
 
+        return print.toString();
     }
 
     /**
      *  This method sorts and groups account statements by holder, then prints them out.
      *
      */
-    public void printStatements() {
-        System.out.println("*Account statements by account holder.");
+    public String printStatements() {
+        StringBuilder print = new StringBuilder();
+
+        print.append("*Account statements by account holder.").append("\n");
 
         List<Account> copy = new List<>();
         for (int i = 0; i < this.size(); i++) {
@@ -69,17 +73,19 @@ public class AccountDatabase extends List<Account> {
             if (prevProfile == null || !prevProfile.equals(profile)) {
                 count++;
                 if (prevProfile != null) {
-                    System.out.println();
+                    print.append("");
                 }
-                System.out.println(count + "." + profile.getFirstName() + " " + profile.getLastName() + " " + profile.getDateOfBirth());
+                print.append("\n").append(count).append(".").append(profile.getFirstName()).append(" ").append(profile.getLastName()).append(" ").append(profile.getDateOfBirth()).append("\n");
             } else {
-                System.out.println();
+                print.append("");
             }
-            System.out.println("\t[Account#] " + account.getNumber());
-            account.statement();
+            print.append("\t[Account#] ").append(account.getNumber()).append("\n");
+            print.append(account.statement());
             prevProfile = profile;
         }
-        System.out.println("\n*end of statements.");
+        print.append("\n*end of statements.");
+
+        return print.toString();
     }
 
 
@@ -221,10 +227,12 @@ public class AccountDatabase extends List<Account> {
    /**
     * This method prints out the array sorted by  branch, county and city.
     */
-   public void printByBranch() {
+   public String printByBranch() {
+       StringBuilder print = new StringBuilder();
+
        if (this.size() == 0) {
-           System.out.println("Account database is empty!");
-           return;
+           print.append("Account database is empty!");
+           return print.toString();
        }
 
        List<Account> copy = new List<>();
@@ -233,7 +241,7 @@ public class AccountDatabase extends List<Account> {
        }
        Sort.account(copy, 'B');
 
-       System.out.println("\n*List of accounts ordered by branch location (county, city).");
+       print.append("\n*List of accounts ordered by branch location (county, city).");
 
        String currCounty = "";
 
@@ -242,24 +250,28 @@ public class AccountDatabase extends List<Account> {
            String county = copy.get(i).getNumber().getBranch().getCounty();
 
            if (!county.equals(currCounty)) {
-               System.out.println("County: " + county);
+               print.append("\nCounty: ").append(county).append("\n");
                currCounty = county;
            }
 
-           System.out.println(copy.get(i).toString());
+           print.append(copy.get(i).toString()).append("\n");
        }
 
-       System.out.println("*end of list.\n");
+       print.append("\n").append("*end of list.");
+
+       return print.toString();
    }
 
    /**
     * This method prints out the array sorted by last name, first name,
     * date of birth and account number.
     */
-   public void printByHolder() {
+   public String printByHolder() {
+       StringBuilder print =  new StringBuilder();
+
        if (this.size() == 0) {
-           System.out.println("Account database is empty!");
-           return;
+           print.append("Account database is empty!");
+           return print.toString();
        }
 
        List<Account> copy = new List<>();
@@ -268,11 +280,13 @@ public class AccountDatabase extends List<Account> {
        }
        Sort.account(copy, 'H');
 
-       System.out.println("\n*List of accounts ordered by account holder and number.");
+       print.append("\n*List of accounts ordered by account holder and number.").append("\n");
        for (int i = 0; i < this.size(); i++) {
-           System.out.println(copy.get(i).toString());
+           print.append(copy.get(i).toString()).append("\n");
        }
-       System.out.println("*end of list.\n");
+       print.append("\n").append("*end of list.\n");
+
+       return print.toString();
    }
 
    /**
@@ -280,10 +294,12 @@ public class AccountDatabase extends List<Account> {
     * account number.
     *
     */
-   public void printByType() {
+   public String printByType() {
+        StringBuilder print = new StringBuilder();
 
        if (this.size() == 0) {
-           System.out.println("Account database is empty!");
+           print.append("Account database is empty!");
+           return print.toString();
        }
 
        List<Account> copy = new List<>();
@@ -292,18 +308,20 @@ public class AccountDatabase extends List<Account> {
        }
        Sort.account(copy,'T');
        String currType = "";
-       System.out.println("\n*List of accounts ordered by account type and number.");
+       print.append("\n*List of accounts ordered by account type and number.");
        for (int i = 0; i < this.size(); i++) {
            Account account = copy.get(i);
            String type = String.valueOf(account.getNumber().getType());
 
            if (!type.equals(currType)) {
-               System.out.println("Account Type: " + account.getNumber().getType());
+               print.append("\nAccount Type: ").append(account.getNumber().getType()).append("\n");
                currType = type;
            }
-           System.out.println(account);
+           print.append(account).append("\n");
        }
-       System.out.println("*end of list.\n");
+       print.append("\n").append("*end of list.\n");
+
+       return print.toString();
    }
 }
 
