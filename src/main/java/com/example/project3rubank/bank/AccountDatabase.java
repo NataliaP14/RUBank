@@ -79,7 +79,6 @@ public class AccountDatabase extends List<Account> {
             account.statement();
             prevProfile = profile;
         }
-
         System.out.println("\n*end of statements.");
     }
 
