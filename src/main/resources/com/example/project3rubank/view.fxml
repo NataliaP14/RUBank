@@ -105,7 +105,7 @@
 
                             <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
                                 <Button fx:id="openAccount" mnemonicParsing="false" onAction="#openAccount" styleClass="primary-button" text="Open Account" />
-                                <Button fx:id="clearFields" mnemonicParsing="false" onAction="#clearFields" styleClass="secondary-button" text="Clear All Fields" />
+                                <Button fx:id="clearFields" mnemonicParsing="false" styleClass="secondary-button" text="Clear All Fields" />
                             </HBox>
                         </VBox>
                         <columnConstraints>
