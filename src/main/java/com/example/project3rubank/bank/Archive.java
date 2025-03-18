@@ -66,16 +66,21 @@ public class Archive {
     /**
      * Prints the closed accounts in the linked list
      * Traverses through the linked list and prints the accounts
+     *
+     * @return
      */
-    public void print() {
+    public String print() {
+        StringBuilder print = new StringBuilder();
+
         AccountNode currentNode = first;
 
-        System.out.println("\n*List of closed accounts in the archive.");
+        print.append("\n*List of closed accounts in the archive.").append("\n");
 
         while (currentNode != null) {
-            System.out.println(currentNode);
+            print.append(currentNode).append("\n");
             currentNode = currentNode.next;
         }
-        System.out.println("*end of list.\n");
+        print.append("*end of list.\n");
+        return print.toString();
     }
 }
