@@ -29,6 +29,14 @@ public class Controller {
 	private static final double MONEY_MARKET_MINIMUM = 2000.0;
 	private AccountDatabase accountDB;
 
+	@FXML private TextArea outputTextArea;
+	@FXML private Button printByBranchButton;
+	@FXML private Button printByTypeButton;
+	@FXML private Button printByHolderButton;
+	@FXML private Button printStatementsButton;
+	@FXML private Button LoadAccountsButton;
+	@FXML private Button printArchiveButton;
+	@FXML private Button LoadActivitiesButton;
 	@FXML private TextField accountNumber;
 	@FXML private TextField transactionAmount;
 	@FXML private Button deposit;
@@ -359,7 +367,7 @@ public class Controller {
 		String amountString = transactionAmount.getText().trim();
 
 		if(accNumber.isEmpty() || amountString.isEmpty()) {
-			System.out.println("Please fill in both fields.");
+			notifications("Please fill in both fields.", false);
 			return;
 		}
 
@@ -367,17 +375,17 @@ public class Controller {
 
 		try {
 			amount = Double.parseDouble(amountString);
-			if (amount <= 0) { System.out.println(amount + " - deposit amount cannot be 0 or negative."); return; }
+			if (amount <= 0) { notifications(amount + " - deposit amount cannot be 0 or negative.", false); return; }
 		} catch(NumberFormatException e) {
-			System.out.println("For input string: \"" + amountString + "\" - not a valid amount."); return;
+			notifications("For input string: \"" + amountString + "\" - not a valid amount.", false); return;
 		}
 		boolean accountFound = false;
 
 		for (int i = 0; i < accountDB.size(); i++) {
 			if (accountDB.get(i).getNumber().toString().equals(accNumber)) { accountFound = true;
 				accountDB.deposit(accountDB.get(i).getNumber(), amount);
-				System.out.println("$" + String.format("%,.2f", amount) +
-						" deposited to " + accNumber);
+				notifications("$" + String.format("%,.2f", amount) +
+						" deposited to " + accNumber, true);
 
 				if (accountDB.get(i).getNumber().getType() == AccountType.MONEY_MARKET) {
 					MoneyMarket moneyAcc = (MoneyMarket) accountDB.get(i);
@@ -390,7 +398,7 @@ public class Controller {
 				break;
 			}
 		}
-		if (!accountFound) { System.out.println(accNumber + " does not exist."); }
+		if (!accountFound) { notifications(accNumber + " does not exist.", false); }
 
 	}
 
@@ -406,7 +414,7 @@ public class Controller {
 		String amountString = transactionAmount.getText().trim();
 
 		if(accNumber.isEmpty() || amountString.isEmpty()) {
-			System.out.println("Please fill in both fields.");
+			notifications("Please fill in both fields.", false);
 			return;
 		}
 
@@ -415,11 +423,11 @@ public class Controller {
 		try {
 			amount = Double.parseDouble(amountString);
 			if(amount <= 0){
-				System.out.println(amountString + " withdrawal amount cannot be 0 or negative.");
+				notifications(amountString + " withdrawal amount cannot be 0 or negative.", false);
 				return;
 			}
 		} catch (NumberFormatException e) {
-			System.out.println("For input string: \"" + amountString + "\" - not a valid amount.");
+			notifications("For input string: \"" + amountString + "\" - not a valid amount.", false);
 			return;
 		}
 
@@ -439,13 +447,12 @@ public class Controller {
 						moneyAcc.incrementWithdrawals();
 
 						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
-							System.out.print(accNumber + " balance below $2,000 - ");
 							if (amount <= accountDB.get(i).getBalance()) {
-								System.out.println("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber);
+								notifications(accNumber + "\" balance below $2,000 - \" $" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true);
 							}
 						}
 						else {
-								if (amount <= accountDB.get(i).getBalance()) { System.out.println("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber); }
+							if (amount <= accountDB.get(i).getBalance()) { notifications("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true); }
 						}
 
 						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM_FOR_LOYAL) {
@@ -453,21 +460,21 @@ public class Controller {
 						}
 						return;
 					}
-					System.out.println("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber);
+					notifications("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true);
 					return;
 				}
 				if (amount > accountDB.get(i).getBalance() && accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
-					System.out.println(accNumber + " balance below $2,000 - " + "withdrawing $" + String.format("%,.2f", amount) + " - insufficient funds.");
+					notifications(accNumber + " balance below $2,000 - " + "withdrawing $" + String.format("%,.2f", amount) + " - insufficient funds.", false);
 					return;
 				}
 				else if (amount > accountDB.get(i).getBalance()) {
-					System.out.println(accNumber + " - insufficient funds.");
+					notifications(accNumber + " - insufficient funds.", false);
 					return;
 				}
 				break;
 			}
 		}
-		if(!accountFound) { System.out.println(accNumber + " does not exist."); }
+		if(!accountFound) { notifications(accNumber + " does not exist.", false); }
 	}
 
 
@@ -616,142 +623,23 @@ public class Controller {
 	}
 
 	/**
-	 * This method handles the PB command
+
+	 *
+	 * @param actionEvent
 	 */
 	@FXML
-	private void printByBranch(ActionEvent actionEvent) {
-		if (accountDB.isEmpty()) {
-			System.out.println("Account database is empty!");
-			return;
-		}
-
-		List<Account> copy = new List<>();
-		for (int i = 0; i < accountDB.size(); i++) {
-			copy.add(accountDB.get(i));
-		}
-		Sort.account(copy, 'B');
-
-		System.out.println("\n*List of accounts ordered by branch location (county, city).");
-
-		String currCounty = "";
-
-		for (int i = 0; i < accountDB.size(); i++) {
-
-			String county = copy.get(i).getNumber().getBranch().getCounty();
-
-			if (!county.equals(currCounty)) {
-				System.out.println("County: " + county);
-				currCounty = county;
-			}
-			System.out.println(copy.get(i).toString());
-		}
-		System.out.println("*end of list.\n");
+	private void clearFields(ActionEvent actionEvent) {
+		fName.clear();
+		lName.clear();
+		initialDeposit.clear();
+		dobValue.setValue(null);
+		cdDateOpen.setValue(null);
+		accountTypeComboBox.getSelectionModel().clearSelection();
+		branchComboBox.getSelectionModel().clearSelection();
+		campusToggleGroup.selectToggle(null);
+		termsToggleGroup.selectToggle(null);
+		loyalCustomerCheckBox.setSelected(false);
 	}
-
-	/**
-	 * This method handles the PT command
-	 */
-	@FXML
-	private void printByType(ActionEvent actionEvent) {
-		if (accountDB.isEmpty()) {
-			System.out.println("Account database is empty!");
-		}
-
-		List<Account> copy = new List<>();
-		for (int i = 0; i < accountDB.size(); i++) {
-			copy.add(accountDB.get(i));
-		}
-		Sort.account(copy,'T');
-		String currType = "";
-		System.out.println("\n*List of accounts ordered by account type and number.");
-		for (int i = 0; i < accountDB.size(); i++) {
-			Account account = copy.get(i);
-			String type = String.valueOf(account.getNumber().getType());
-
-			if (!type.equals(currType)) {
-				System.out.println("Account Type: " + account.getNumber().getType());
-				currType = type;
-			}
-			System.out.println(account);
-		}
-		System.out.println("*end of list.\n");
-	}
-
-
-
-	/**
-	 * This method handles the PH command
-	 */
-	@FXML
-	private void printByHolder(ActionEvent actionEvent) {
-		if (accountDB.isEmpty()) {
-			System.out.println("Account database is empty!");
-			return;
-		}
-
-		List<Account> copy = new List<>();
-		for (int i = 0; i < accountDB.size(); i++) {
-			copy.add(accountDB.get(i));
-		}
-		Sort.account(copy, 'H');
-
-		System.out.println("\n*List of accounts ordered by account holder and number.");
-		for (int i = 0; i < accountDB.size(); i++) {
-			System.out.println(copy.get(i).toString());
-		}
-		System.out.println("*end of list.\n");
-	}
-
-
-	/**
-	 *  This method handles the  PS command
-	 */
-	@FXML
-	private void printStatements(ActionEvent actionEvent) {
-		System.out.println("*Account statements by account holder.");
-
-		List<Account> copy = new List<>();
-		for (int i = 0; i < accountDB.size(); i++) {
-			copy.add(accountDB.get(i));
-		}
-		Sort.account(copy, 'H');
-		int count = 0;
-		Profile prevProfile= null;
-
-		for (int i = 0; i < copy.size(); i++) {
-			Account account = copy.get(i);
-			Profile profile = account.getHolder();
-
-			if (prevProfile == null || !prevProfile.equals(profile)) {
-				count++;
-				if (prevProfile != null) {
-					System.out.println();
-				}
-				System.out.println(count + "." + profile.getFirstName() + " " + profile.getLastName() + " " + profile.getDateOfBirth());
-			} else {
-				System.out.println();
-			}
-			System.out.println("\t[Account#] " + account.getNumber());
-			account.statement();
-			prevProfile = profile;
-		}
-
-		System.out.println("\n*end of statements.");
-	}
-
-	/**
-	 *  This method handles the PA command.
-	 */
-	@FXML
-	private void printArchive(ActionEvent actionEvent) {
-		if(accountDB != null) {
-			accountDB.printArchive();
-		} else {
-			System.out.println("Archive is empty");
-		}
-	}
-
-
 
 
 
@@ -853,4 +741,6 @@ public class Controller {
 		});
 
 	}
+
+
 }

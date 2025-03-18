@@ -9,6 +9,7 @@
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.BorderPane?>
@@ -16,7 +17,6 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -105,7 +105,7 @@
 
                             <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
                                 <Button fx:id="openAccount" mnemonicParsing="false" onAction="#openAccount" styleClass="primary-button" text="Open Account" />
-                                <Button fx:id="clearFields" mnemonicParsing="false" styleClass="secondary-button" text="Clear All Fields" />
+                                <Button fx:id="clearFields" mnemonicParsing="false" onAction="#clearFields" styleClass="secondary-button" text="Clear All Fields" />
                             </HBox>
                         </VBox>
                         <columnConstraints>
@@ -123,13 +123,18 @@
                 <VBox alignment="TOP_CENTER" prefWidth="450.0" spacing="15.0" VBox.vgrow="ALWAYS">
                     <Text styleClass="section-title" text="Withdraw/Deposit" textAlignment="JUSTIFY" />
                     <VBox alignment="TOP_CENTER" spacing="15.0">
-                        <HBox alignment="TOP_CENTER" spacing="15.0">
+                        <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                            <Label text="Account Number:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
                             <TextField fx:id="accountNumber" prefWidth="200.0" promptText="Account Number" />
+                        </HBox>
+                        <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                            <Label text="Amount: " GridPane.columnIndex="0" GridPane.rowIndex="6" />
                             <TextField fx:id="transactionAmount" prefWidth="150.0" promptText="Amount" />
                         </HBox>
+
                         <HBox alignment="TOP_CENTER" spacing="15.0">
-                            <Button fx:id="deposit" mnemonicParsing="false" styleClass="success-button" text="Deposit" onAction="#deposit"/>
-                            <Button fx:id="withdraw" mnemonicParsing="false" styleClass="warning-button" text="Withdraw" onAction="#withdraw"/>
+                            <Button fx:id="deposit" mnemonicParsing="false" onAction="#deposit" styleClass="success-button" text="Deposit" />
+                            <Button fx:id="withdraw" mnemonicParsing="false" onAction="#withdraw" styleClass="warning-button" text="Withdraw" />
                         </HBox>
                     </VBox>
                 </VBox>
@@ -143,29 +148,42 @@
                         <Text styleClass="section-title" text="Close Account" />
 
                         <VBox alignment="TOP_CENTER" spacing="15.0">
-                            <DatePicker fx:id="closeDate" prefWidth="200.0" promptText="Close Date" />
+                            <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                <Label text="Close Date: " GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                <DatePicker fx:id="closeDate" prefWidth="200.0" promptText="Close Date" />
+                            </HBox>
                             <TabPane tabClosingPolicy="UNAVAILABLE">
                                 <Tab text="By Account Number">
                                     <VBox alignment="TOP_CENTER" spacing="15.0">
                                         <padding>
                                             <Insets bottom="10.0" top="10.0" />
                                         </padding>
-                                        <TextField fx:id="closeAccountNumber" prefHeight="27.0" prefWidth="242.0" promptText="Account Number" />
+                                        <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                            <Label text="Account Number: " GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                            <TextField fx:id="closeAccountNumber" prefHeight="27.0" prefWidth="242.0" promptText="Account Number" />
+                                        </HBox>
                                         <Button fx:id="closeByNumber" mnemonicParsing="false" onAction="#closeAccountByNumber" styleClass="danger-button" text="Close Account" />
                                     </VBox>
                                 </Tab>
                                 <Tab text="By Profile">
-                                    <VBox spacing="15.0">
+                                    <VBox alignment="TOP_CENTER" spacing="15.0">
                                         <padding>
                                             <Insets bottom="10.0" top="10.0" />
                                         </padding>
-                                        <HBox spacing="15.0">
-                                            <TextField fx:id="closeFName" prefHeight="27.0" prefWidth="473.0" promptText="First Name" />
+                                        <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                            <Label text="First Name: " GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                            <TextField fx:id="closeFName" prefHeight="27.0" prefWidth="235.0" promptText="First Name" />
                                         </HBox>
-                                         <TextField fx:id="closeLName" prefHeight="27.0" prefWidth="235.0" promptText="Last Name" />
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="DOB:" />
-                                         <DatePicker fx:id="closeProfileDob" prefWidth="150.0" promptText="Date of Birth" />
-                                        <Button fx:id="closeByProfile" mnemonicParsing="false" onAction="#closeAllAccounts" styleClass="danger-button" text="Close All Accounts" />
+                                        <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                            <Label text="Last Name: " GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                            <TextField fx:id="closeLName" prefHeight="27.0" prefWidth="235.0" promptText="Last Name" />
+                                        </HBox>
+
+                                        <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                            <Label text="Date Of Birth: " GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                            <DatePicker fx:id="closeProfileDob" prefWidth="150.0" promptText="Date of Birth" />
+                                        </HBox>
+                                        <Button fx:id="closeByProfile" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#closeAllAccounts" styleClass="danger-button" text="Close All Accounts" />
                                     </VBox>
                                 </Tab>
                             </TabPane>
@@ -190,6 +208,7 @@
                         <Button fx:id="LoadAccountsButton" mnemonicParsing="false" styleClass="info-button" text="Load Accounts From File"/>
                         <Button fx:id="LoadActivitiesButton" mnemonicParsing="false" styleClass="info-button" text="Load Activities From File"/>
                     </HBox>
+                    <TextArea fx:id="outputTextArea" editable="false" prefHeight="500.0" prefWidth="600.0" promptText="Output will be displayed here...." wrapText="true" />
                 </VBox>
             </Tab>
         </TabPane>
