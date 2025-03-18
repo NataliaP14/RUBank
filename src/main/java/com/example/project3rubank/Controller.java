@@ -1,6 +1,8 @@
 package com.example.project3rubank;
 
 import com.example.project3rubank.bank.*;
+import com.example.project3rubank.util.List;
+import com.example.project3rubank.util.Sort;
 import javafx.animation.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,6 +17,7 @@ import javafx.geometry.Pos;
 import javafx.util.Duration;
 
 import java.security.Key;
+import java.util.StringTokenizer;
 
 
 /**
@@ -35,10 +38,14 @@ public class Controller {
 	@FXML private Button printArchiveButton;
 	@FXML private Button LoadActivitiesButton;
 	@FXML private TextField accountNumber;
-	@FXML private TextField amount;
 	@FXML private TextField transactionAmount;
 	@FXML private Button deposit;
 	@FXML private Button withdraw;
+	@FXML private Button printByBranchButton;
+	@FXML private Button printByTypeButton;
+	@FXML private Button printByHolderButton;
+	@FXML private Button printStatementsButton;
+	@FXML private Button printArchiveButton;
 	@FXML private TextField closeFName;
 	@FXML private TextField closeLName;
 	@FXML private DatePicker closeProfileDob;
@@ -107,6 +114,15 @@ public class Controller {
 
 		withdraw.setOnAction(this::withdraw);
 
+		printByBranchButton.setOnAction(this::printByBranch);
+
+		printByTypeButton.setOnAction(this::printByType);
+
+		printByHolderButton.setOnAction(this::printByHolder);
+
+		printStatementsButton.setOnAction(this::printStatements);
+
+		printArchiveButton.setOnAction(this::printArchive);
 	}
 
 
@@ -607,6 +623,7 @@ public class Controller {
 	}
 
 	/**
+
 	 *
 	 * @param actionEvent
 	 */
@@ -623,6 +640,7 @@ public class Controller {
 		termsToggleGroup.selectToggle(null);
 		loyalCustomerCheckBox.setSelected(false);
 	}
+
 
 
 	/**
