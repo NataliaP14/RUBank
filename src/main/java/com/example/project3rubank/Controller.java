@@ -620,11 +620,32 @@ public class Controller {
 	 */
 	@FXML
 	private void printByBranch(ActionEvent actionEvent) {
-		if(accountDB != null) {
-			accountDB.printByType();
-		} else {
-			System.out.println("Account database is empty.");
+		if (accountDB.isEmpty()) {
+			System.out.println("Account database is empty!");
+			return;
 		}
+
+		List<Account> copy = new List<>();
+		for (int i = 0; i < accountDB.size(); i++) {
+			copy.add(accountDB.get(i));
+		}
+		Sort.account(copy, 'B');
+
+		System.out.println("\n*List of accounts ordered by branch location (county, city).");
+
+		String currCounty = "";
+
+		for (int i = 0; i < accountDB.size(); i++) {
+
+			String county = copy.get(i).getNumber().getBranch().getCounty();
+
+			if (!county.equals(currCounty)) {
+				System.out.println("County: " + county);
+				currCounty = county;
+			}
+			System.out.println(copy.get(i).toString());
+		}
+		System.out.println("*end of list.\n");
 	}
 
 	/**
@@ -632,11 +653,28 @@ public class Controller {
 	 */
 	@FXML
 	private void printByType(ActionEvent actionEvent) {
-		if(accountDB != null) {
-			accountDB.printByType();
-		} else {
-			System.out.println("Account database is empty.");
+		if (accountDB.isEmpty()) {
+			System.out.println("Account database is empty!");
 		}
+
+		List<Account> copy = new List<>();
+		for (int i = 0; i < accountDB.size(); i++) {
+			copy.add(accountDB.get(i));
+		}
+		Sort.account(copy,'T');
+		String currType = "";
+		System.out.println("\n*List of accounts ordered by account type and number.");
+		for (int i = 0; i < accountDB.size(); i++) {
+			Account account = copy.get(i);
+			String type = String.valueOf(account.getNumber().getType());
+
+			if (!type.equals(currType)) {
+				System.out.println("Account Type: " + account.getNumber().getType());
+				currType = type;
+			}
+			System.out.println(account);
+		}
+		System.out.println("*end of list.\n");
 	}
 
 
@@ -646,11 +684,22 @@ public class Controller {
 	 */
 	@FXML
 	private void printByHolder(ActionEvent actionEvent) {
-		if(accountDB != null) {
-			accountDB.printByHolder();
-		} else {
-			System.out.println("Account database is empty.");
+		if (accountDB.isEmpty()) {
+			System.out.println("Account database is empty!");
+			return;
 		}
+
+		List<Account> copy = new List<>();
+		for (int i = 0; i < accountDB.size(); i++) {
+			copy.add(accountDB.get(i));
+		}
+		Sort.account(copy, 'H');
+
+		System.out.println("\n*List of accounts ordered by account holder and number.");
+		for (int i = 0; i < accountDB.size(); i++) {
+			System.out.println(copy.get(i).toString());
+		}
+		System.out.println("*end of list.\n");
 	}
 
 
@@ -659,11 +708,35 @@ public class Controller {
 	 */
 	@FXML
 	private void printStatements(ActionEvent actionEvent) {
-		if(accountDB != null) {
-			accountDB.printStatements();
-		} else {
-			System.out.println("Account database is empty.");
+		System.out.println("*Account statements by account holder.");
+
+		List<Account> copy = new List<>();
+		for (int i = 0; i < accountDB.size(); i++) {
+			copy.add(accountDB.get(i));
 		}
+		Sort.account(copy, 'H');
+		int count = 0;
+		Profile prevProfile= null;
+
+		for (int i = 0; i < copy.size(); i++) {
+			Account account = copy.get(i);
+			Profile profile = account.getHolder();
+
+			if (prevProfile == null || !prevProfile.equals(profile)) {
+				count++;
+				if (prevProfile != null) {
+					System.out.println();
+				}
+				System.out.println(count + "." + profile.getFirstName() + " " + profile.getLastName() + " " + profile.getDateOfBirth());
+			} else {
+				System.out.println();
+			}
+			System.out.println("\t[Account#] " + account.getNumber());
+			account.statement();
+			prevProfile = profile;
+		}
+
+		System.out.println("\n*end of statements.");
 	}
 
 	/**
