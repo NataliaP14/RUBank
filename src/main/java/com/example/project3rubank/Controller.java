@@ -1,6 +1,8 @@
 package com.example.project3rubank;
 
 import com.example.project3rubank.bank.*;
+import com.example.project3rubank.util.List;
+import com.example.project3rubank.util.Sort;
 import javafx.animation.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,6 +17,7 @@ import javafx.geometry.Pos;
 import javafx.util.Duration;
 
 import java.security.Key;
+import java.util.StringTokenizer;
 
 
 /**
@@ -27,10 +30,14 @@ public class Controller {
 	private AccountDatabase accountDB;
 
 	@FXML private TextField accountNumber;
-	@FXML private TextField amount;
 	@FXML private TextField transactionAmount;
 	@FXML private Button deposit;
 	@FXML private Button withdraw;
+	@FXML private Button printByBranchButton;
+	@FXML private Button printByTypeButton;
+	@FXML private Button printByHolderButton;
+	@FXML private Button printStatementsButton;
+	@FXML private Button printArchiveButton;
 	@FXML private TextField closeFName;
 	@FXML private TextField closeLName;
 	@FXML private DatePicker closeProfileDob;
@@ -99,6 +106,15 @@ public class Controller {
 
 		withdraw.setOnAction(this::withdraw);
 
+		printByBranchButton.setOnAction(this::printByBranch);
+
+		printByTypeButton.setOnAction(this::printByType);
+
+		printByHolderButton.setOnAction(this::printByHolder);
+
+		printStatementsButton.setOnAction(this::printStatements);
+
+		printArchiveButton.setOnAction(this::printArchive);
 	}
 
 
@@ -598,6 +614,143 @@ public class Controller {
 		}
 		return (balance * (rate / days_per_year) * day);
 	}
+
+	/**
+	 * This method handles the PB command
+	 */
+	@FXML
+	private void printByBranch(ActionEvent actionEvent) {
+		if (accountDB.isEmpty()) {
+			System.out.println("Account database is empty!");
+			return;
+		}
+
+		List<Account> copy = new List<>();
+		for (int i = 0; i < accountDB.size(); i++) {
+			copy.add(accountDB.get(i));
+		}
+		Sort.account(copy, 'B');
+
+		System.out.println("\n*List of accounts ordered by branch location (county, city).");
+
+		String currCounty = "";
+
+		for (int i = 0; i < accountDB.size(); i++) {
+
+			String county = copy.get(i).getNumber().getBranch().getCounty();
+
+			if (!county.equals(currCounty)) {
+				System.out.println("County: " + county);
+				currCounty = county;
+			}
+			System.out.println(copy.get(i).toString());
+		}
+		System.out.println("*end of list.\n");
+	}
+
+	/**
+	 * This method handles the PT command
+	 */
+	@FXML
+	private void printByType(ActionEvent actionEvent) {
+		if (accountDB.isEmpty()) {
+			System.out.println("Account database is empty!");
+		}
+
+		List<Account> copy = new List<>();
+		for (int i = 0; i < accountDB.size(); i++) {
+			copy.add(accountDB.get(i));
+		}
+		Sort.account(copy,'T');
+		String currType = "";
+		System.out.println("\n*List of accounts ordered by account type and number.");
+		for (int i = 0; i < accountDB.size(); i++) {
+			Account account = copy.get(i);
+			String type = String.valueOf(account.getNumber().getType());
+
+			if (!type.equals(currType)) {
+				System.out.println("Account Type: " + account.getNumber().getType());
+				currType = type;
+			}
+			System.out.println(account);
+		}
+		System.out.println("*end of list.\n");
+	}
+
+
+
+	/**
+	 * This method handles the PH command
+	 */
+	@FXML
+	private void printByHolder(ActionEvent actionEvent) {
+		if (accountDB.isEmpty()) {
+			System.out.println("Account database is empty!");
+			return;
+		}
+
+		List<Account> copy = new List<>();
+		for (int i = 0; i < accountDB.size(); i++) {
+			copy.add(accountDB.get(i));
+		}
+		Sort.account(copy, 'H');
+
+		System.out.println("\n*List of accounts ordered by account holder and number.");
+		for (int i = 0; i < accountDB.size(); i++) {
+			System.out.println(copy.get(i).toString());
+		}
+		System.out.println("*end of list.\n");
+	}
+
+
+	/**
+	 *  This method handles the  PS command
+	 */
+	@FXML
+	private void printStatements(ActionEvent actionEvent) {
+		System.out.println("*Account statements by account holder.");
+
+		List<Account> copy = new List<>();
+		for (int i = 0; i < accountDB.size(); i++) {
+			copy.add(accountDB.get(i));
+		}
+		Sort.account(copy, 'H');
+		int count = 0;
+		Profile prevProfile= null;
+
+		for (int i = 0; i < copy.size(); i++) {
+			Account account = copy.get(i);
+			Profile profile = account.getHolder();
+
+			if (prevProfile == null || !prevProfile.equals(profile)) {
+				count++;
+				if (prevProfile != null) {
+					System.out.println();
+				}
+				System.out.println(count + "." + profile.getFirstName() + " " + profile.getLastName() + " " + profile.getDateOfBirth());
+			} else {
+				System.out.println();
+			}
+			System.out.println("\t[Account#] " + account.getNumber());
+			account.statement();
+			prevProfile = profile;
+		}
+
+		System.out.println("\n*end of statements.");
+	}
+
+	/**
+	 *  This method handles the PA command.
+	 */
+	@FXML
+	private void printArchive(ActionEvent actionEvent) {
+		if(accountDB != null) {
+			accountDB.printArchive();
+		} else {
+			System.out.println("Archive is empty");
+		}
+	}
+
 
 
 
