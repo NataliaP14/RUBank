@@ -100,7 +100,11 @@ public class AccountDatabase extends List<Account> {
         while (scanner.hasNextLine()) {
             StringTokenizer token = new StringTokenizer(scanner.nextLine(), ",");
             String type = token.nextToken().toLowerCase(); String branchTxt = token.nextToken(); // branch and type
-            String fName = token.nextToken(); String lName = token.nextToken(); Date dob = new Date(token.nextToken()); //profile info
+            String fName = token.nextToken(); String lName = token.nextToken();
+            String dateString = token.nextToken();
+            String[] parts = dateString.split("/");
+            String newDate = parts[2] + "-" + parts[0] + "-" + parts[1];
+            Date dob = new Date(newDate);
             Double balance = Double.parseDouble(token.nextToken());
             Profile holder = new Profile(fName, lName, dob);
             Branch branch = Branch.valueOf(branchTxt.toUpperCase());
@@ -114,7 +118,12 @@ public class AccountDatabase extends List<Account> {
                     Campus campus = null;
                     for (Campus c : Campus.values()) { if (c.getCode().equals(campusCode)) { campus = c; break; } }
                     account = new CollegeChecking(number, holder, balance, campus);break;
-                case "certificate": number = new AccountNumber(branch, AccountType.CD);int term = Integer.parseInt(token.nextToken());Date open = new Date(token.nextToken());account = new CertificateDeposit(number, holder, balance, isLoyal, term, open);
+                case "certificate": number = new AccountNumber(branch, AccountType.CD);int term = Integer.parseInt(token.nextToken());
+                String str = token.nextToken();
+                String[] dateSplit = str.split("/");
+                String newCDDate = dateSplit[2] + '-' + dateSplit[0] + "-" + dateSplit[1];
+                Date open = new Date(newCDDate);
+                account = new CertificateDeposit(number, holder, balance, isLoyal, term, open);
 
             }
             if (account != null) { this.add(account); }
@@ -151,7 +160,10 @@ public class AccountDatabase extends List<Account> {
             StringTokenizer token = new StringTokenizer(line, ",");
             char type = token.nextToken().charAt(0);
             String number = token.nextToken();
-            Date date = new Date(token.nextToken());
+            String dateString = token.nextToken();
+            String[] parts = dateString.split("/");
+            String newDate = parts[2] + '-' + parts[0] + "-" + parts[1];
+            Date date = new Date(newDate);
             String branchTxt = token.nextToken().toLowerCase();
             int amount = Integer.parseInt(token.nextToken());
             Branch location = Branch.valueOf(branchTxt.toUpperCase());

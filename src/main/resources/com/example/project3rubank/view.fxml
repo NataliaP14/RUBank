@@ -105,7 +105,7 @@
 
                             <HBox alignment="TOP_CENTER" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
                                 <Button fx:id="openAccount" mnemonicParsing="false" onAction="#openAccount" styleClass="primary-button" text="Open Account" />
-                                <Button fx:id="clearFields" mnemonicParsing="false" styleClass="secondary-button" text="Clear All Fields" />
+                                <Button fx:id="clearFields" mnemonicParsing="false" onAction ="#clearFields" styleClass="secondary-button" text="Clear All Fields" />
                             </HBox>
                         </VBox>
                         <columnConstraints>
@@ -205,8 +205,8 @@
                         <Button fx:id="printByHolderButton" mnemonicParsing="false" styleClass="info-button" text="Print By Holder" onAction="#printByHolder"/>
                         <Button fx:id="printStatementsButton" mnemonicParsing="false" styleClass="info-button" text="Print Statements" onAction="#printStatements"/>
                         <Button fx:id="printArchiveButton" mnemonicParsing="false" styleClass="info-button" text="Print Archive" onAction="#printArchive"/>
-                        <Button fx:id="LoadAccountsButton" mnemonicParsing="false" styleClass="info-button" text="Load Accounts From File"/>
-                        <Button fx:id="LoadActivitiesButton" mnemonicParsing="false" styleClass="info-button" text="Load Activities From File"/>
+                        <Button fx:id="loadAccountsButton" mnemonicParsing="false" onAction="#loadAccounts" styleClass="info-button" text="Load Accounts From File"/>
+                        <Button fx:id="loadActivitiesButton" mnemonicParsing="false" onAction="#loadActivities" styleClass="info-button" text="Load Activities From File"/>
                     </HBox>
                     <TextArea fx:id="outputTextArea" editable="false" prefHeight="500.0" prefWidth="600.0" promptText="Output will be displayed here...." wrapText="true" />
                 </VBox>

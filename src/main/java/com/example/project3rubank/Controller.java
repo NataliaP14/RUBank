@@ -14,10 +14,14 @@ import com.example.project3rubank.util.Date;
 import javafx.scene.layout.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.security.Key;
-
+import java.io.File;
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 
 
 /**
@@ -27,6 +31,9 @@ import java.security.Key;
 public class Controller {
 	private static final double MONEY_MARKET_MINIMUM_FOR_LOYAL = 5000.0;
 	private static final double MONEY_MARKET_MINIMUM = 2000.0;
+	public Button loadAccountsButton;
+	public Button loadActivitiesButton;
+	public TextArea outputTextArea;
 	private AccountDatabase accountDB;
 
 	@FXML private TextField accountNumber;
@@ -59,7 +66,6 @@ public class Controller {
 	@FXML private ComboBox<Branch> branchComboBox;
 	@FXML private ToggleGroup campusToggleGroup;
 	@FXML private ToggleGroup termsToggleGroup;
-	@FXML private TextArea outputTextArea;
 
 	private void hideElements(AccountType type) {
 		switch (type) {
@@ -100,8 +106,17 @@ public class Controller {
 		};
 	}
 
-
+	/**
+	 *
+	 */
 	private void setUpButtons() {
+		openAccount.setOnAction(this::openAccount);
+
+		clearFields.setOnAction(this::clearFields);
+
+		closeByNumber.setOnAction(this::closeAccountByNumber);
+
+		closeByProfile.setOnAction((this::closeAllAccounts));
 
 		deposit.setOnAction(this::deposit);
 
@@ -116,13 +131,19 @@ public class Controller {
 		printStatementsButton.setOnAction(this::printStatements);
 
 		printArchiveButton.setOnAction(this::printArchive);
+
+		loadAccountsButton.setOnAction(this::loadAccounts);
+
+		loadActivitiesButton.setOnAction(this::loadActivities);
+
+
 	}
 
 
 	/**
 	 * This method is the implementation of the O command, gets user input and validates it to open an account.
 	 *
-	 * @param actionEvent
+	 * @param actionEvent the open account event
 	 */
 	@FXML
 	private void openAccount(ActionEvent actionEvent) {
@@ -679,8 +700,110 @@ public class Controller {
 		}
 	}
 
+	/**
+	 *
+	 * @param actionEvent
+	 */
+	@FXML
+	private void clearFields(ActionEvent actionEvent) {
+		fName.clear();
+		lName.clear();
+		initialDeposit.clear();
+		dobValue.setValue(null);
+		cdDateOpen.setValue(null);
+		accountTypeComboBox.getSelectionModel().clearSelection();
+		branchComboBox.getSelectionModel().clearSelection();
+		campusToggleGroup.selectToggle(null);
+		termsToggleGroup.selectToggle(null);
+		loyalCustomerCheckBox.setSelected(false);
+	}
 
+	@FXML
+	private void loadAccounts(ActionEvent actionEvent) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Acccounts File");
+		FileChooser.ExtensionFilter txtFilter = new FileChooser.ExtensionFilter("Text Files (*.txt)", "*.txt");
+		fileChooser.getExtensionFilters().add(txtFilter);
+		File file = fileChooser.showOpenDialog(new Stage());
 
+		if (file != null) {
+			try {
+				accountDB.loadAccounts(file);
+				outputTextArea.setText("Accounts in " + file.getName() + " loaded to the database.");
+			} catch (IOException e) {
+				outputTextArea.setText("Error processing accounts: " + e.getMessage());
+			}
+		}
+
+	}
+
+	/**
+	 * This method prints the activities that were processed in accountDB
+	 * @param file the file used to process the activities
+	 * @return returns the stringbuilder that prints out the activities
+	 * @throws IOException exception handler to handle the file
+	 */
+	private String printActivities(File file) throws IOException {
+		StringBuilder print = new StringBuilder();
+		print.append("Processing \"").append(file.getName()).append("\"...\n");
+
+		accountDB.processActivities(file);
+		Scanner scanner = new Scanner(file);
+		List<String> printedAccounts = new List<>();
+
+		while (scanner.hasNextLine()) {
+			StringTokenizer token = new StringTokenizer(scanner.nextLine(), ",");
+			token.nextToken();
+			String accountNumber = token.nextToken();
+
+			Account account = null;
+			for (int i = 0; i < accountDB.size(); i++) {
+				if (accountDB.get(i).getNumber().toString().equals(accountNumber)) {
+					account = accountDB.get(i);
+					break;
+				}
+			}
+
+			if (account != null) {
+				if (printedAccounts.contains(accountNumber)) {
+					continue;
+				}
+				printedAccounts.add(accountNumber);
+
+				if (account.getActivities() != null) {
+					List<Activity> activities = account.getActivities();
+					for (int i = 0; i < activities.size(); i++) {
+						Activity activity = activities.get(i);
+						print.append(accountNumber).append("::").append(activity.toString()).append("\n");
+					}
+				}
+			}
+		}
+		scanner.close();
+		print.append("Account activities in \"").append(file.getName()).append("\" processed.\n");
+		return print.toString();
+	}
+
+	/**
+	 *
+	 * @param actionEvent
+	 */
+	@FXML
+	private void loadActivities(ActionEvent actionEvent) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Activities File");
+		FileChooser.ExtensionFilter txtFilter = new FileChooser.ExtensionFilter("Text Files (*.txt)", "*.txt");
+		fileChooser.getExtensionFilters().add(txtFilter);
+		File file = fileChooser.showOpenDialog(new Stage());
+
+		if (file != null) {
+			try {
+				outputTextArea.setText(printActivities(file));
+			} catch (IOException e) {
+				outputTextArea.setText("Error processing activities: " + e.getMessage());
+			}
+		}
+	}
 
 
 	/**
@@ -781,4 +904,5 @@ public class Controller {
 		});
 
 	}
+
 }
