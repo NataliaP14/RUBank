@@ -25,7 +25,8 @@ import java.util.StringTokenizer;
 
 
 /**
- *
+ *	This class manages the user interactions for the JavaFX application.
+ *	It connects the UI interactions with their underlying logic.
  * @Author Natalia Peguero, Olivia Kamau
  */
 public class Controller {
@@ -67,6 +68,10 @@ public class Controller {
 	@FXML private ToggleGroup campusToggleGroup;
 	@FXML private ToggleGroup termsToggleGroup;
 
+	/**
+	 *  This method disables the UI elements depending on the account type.
+	 * @param type	The selected account type.
+	 */
 	private void hideElements(AccountType type) {
 		switch (type) {
 			case CHECKING, MONEY_MARKET:
@@ -96,6 +101,11 @@ public class Controller {
 		}
 	}
 
+	/**
+	 * 	Converts the account type from an enum to a string representation.
+	 * @param type	The specified account type.
+	 * @return		The string representation of the account type.
+	 */
 	private String changeAccountTypeFormat(AccountType type) {
 		return switch (type) {
 			case CHECKING -> "Checking";
@@ -106,8 +116,10 @@ public class Controller {
 		};
 	}
 
+
 	/**
-	 *
+	 *  Private helper method that connects the UI buttons to their
+	 *  specific methods.
 	 */
 	private void setUpButtons() {
 		openAccount.setOnAction(this::openAccount);
@@ -136,13 +148,12 @@ public class Controller {
 
 		loadActivitiesButton.setOnAction(this::loadActivities);
 
-
 	}
 
 
 	/**
-	 * This method is the implementation of the O command, gets user input and validates it to open an account.
-	 *
+	 * This method is the implementation of the O command, gets user input
+	 * and validates it to open an account.
 	 * @param actionEvent the open account event
 	 */
 	@FXML
@@ -152,102 +163,45 @@ public class Controller {
 		AccountType type = accountTypeComboBox.getSelectionModel().getSelectedItem();
 		Branch branch = branchComboBox.getSelectionModel().getSelectedItem();
 		String term = null;
-
 		RadioButton termSelected = (RadioButton) termsToggleGroup.getSelectedToggle();
-		if (termSelected != null) {
-			term = termSelected.getText();
-		}
-
-
+		if (termSelected != null) { term = termSelected.getText(); }
 		if (firstName.isEmpty() || lastName.isEmpty() || type == null || branch == null || dobValue.getValue() == null) {
-			notifications("Fill in the required fields.", false);
-			return;
-		}
+			notifications("Fill in the required fields.", false); return; }
 
 		Date dob = new Date(dobValue.getValue().toString());
-
-		if (!dob.isValid()) {
-			notifications("DOB invalid: " + dob + " not a valid calendar date!", false);
-			return;
-		}
-
-		if (dob.compareTo(new Date()) > 0) {
-			notifications("DOB invalid: " + dob + " cannot be today or a future day.", false);
-			return;
-		}
-
-		if (!dob.isAdult()) {
-			notifications("Not eligible to open: " + dob + " under 18.", false);
-			return;
-		}
+		if (!dob.isValid()) { notifications("DOB invalid: " + dob + " not a valid calendar date!", false); return; }
+		if (dob.compareTo(new Date()) > 0) { notifications("DOB invalid: " + dob + " cannot be today or a future day.", false); return; }
+		if (!dob.isAdult()) { notifications("Not eligible to open: " + dob + " under 18.", false); return;}
 
 		Profile profile = new Profile(firstName, lastName, dob);
-
 		String amountStr = initialDeposit.getText().trim();
 		double initialDeposit = 0.0;
-		try {
-			initialDeposit = Double.parseDouble(amountStr);
-		} catch (NumberFormatException e) {
-			notifications("For input string: \"" + amountStr + "\" - not a valid amount.", false);
-			return;
-		}
+		try { initialDeposit = Double.parseDouble(amountStr);
+		} catch (NumberFormatException e) { notifications("For input string: \"" + amountStr + "\" - not a valid amount.", false); return; }
 
-		if (type == AccountType.CD && term == null) {
-			notifications("Missing term for CD Account", false);
-			return;
-		}
-		if (type == AccountType.CD && cdDateOpen.getValue() == null) {
-			notifications("Missing opening date for CD account", false);
-			return;
-		}
+		if (type == AccountType.CD && term == null) { notifications("Missing term for CD Account", false); return; }
+		if (type == AccountType.CD && cdDateOpen.getValue() == null) { notifications("Missing opening date for CD account", false); return; }
 
 		RadioButton campusSelect = (RadioButton) campusToggleGroup.getSelectedToggle();
-		if (type == AccountType.COLLEGE_CHECKING && campusSelect == null) {
-			notifications("Missing campus for college account", false);
-			return;
-		}
-
-
+		if (type == AccountType.COLLEGE_CHECKING && campusSelect == null) { notifications("Missing campus for college account", false); return; }
 		int termNumber = 0;
-		if (term != null) {
-			try {
-				termNumber = Integer.parseInt(term);
-			} catch (NumberFormatException e) {
-				return;
-			}
-		}
+		if (term != null) { try { termNumber = Integer.parseInt(term);
+			} catch (NumberFormatException e) { return; } }
 
 		Account duplicateAccount = findDuplicateAccount(accountDB, profile, type, termNumber);
 		if (duplicateAccount != null && accountDB.contains(duplicateAccount)) {
-			notifications(firstName + " " + lastName + " already has a " + type + " account.", false);
-			return;
-		}
-
+			notifications(firstName + " " + lastName + " already has a " + type + " account.", false); return; }
 		if (type == AccountType.MONEY_MARKET && initialDeposit < MONEY_MARKET_MINIMUM) {
-			notifications("Minimum of $2,000 to open a Money Market account.", false);
-			return;
-		}
+			notifications("Minimum of $2,000 to open a Money Market account.", false); return; }
 		if (type == AccountType.CD && initialDeposit < CertificateDeposit.MIN_BALANCE) {
-			notifications("Minimum of $1,000 to open a Certificate Deposit account.", false);
-			return;
-		}
-
-		if (initialDeposit <= 0) {
-			notifications("Initial deposit cannot be 0 or negative.", false);
-			return;
-		}
-
+			notifications("Minimum of $1,000 to open a Certificate Deposit account.", false); return; }
+		if (initialDeposit <= 0) { notifications("Initial deposit cannot be 0 or negative.", false); return; }
 		Account account = createAccount(accountDB, type, branch, profile, initialDeposit, termNumber);
-		if (account == null) {
-			return;
-		}
-		accountDB.add(account);
-		notifications(type + " account " + account.getNumber() + " has been opened.", true);
+		if (account == null) { return; } accountDB.add(account); notifications(type + " account " + account.getNumber() + " has been opened.", true);
 	}
 
 	/**
 	 * This method actually creates the account of the user from the O command, based off the type of account they make.
-	 *
 	 * @param accountDB      the database of the accounts, to check if a user already has a checking account
 	 * @param type           the account type to compare to, to create the correct type of account
 	 * @param branch         the branch of where the user wants to create the account
@@ -266,18 +220,12 @@ public class Controller {
 				AccountNumber number1 = new AccountNumber(branch, type);
 				Savings savingsAcc = new Savings(number1, profile, initialDeposit, isLoyal);
 				isLoyal = hasChecking(accountDB, profile);
-				if (isLoyal) {
-					savingsAcc.setLoyal(true);
-				}
-				return savingsAcc;
+				if (isLoyal) { savingsAcc.setLoyal(true); } return savingsAcc;
 			case MONEY_MARKET:
 				AccountNumber number2 = new AccountNumber(branch, type);
 				isLoyal = initialDeposit >= MONEY_MARKET_MINIMUM_FOR_LOYAL;
 				MoneyMarket moneyAcc = new MoneyMarket(number2, profile, initialDeposit, isLoyal);
-				if (isLoyal) {
-					moneyAcc.setLoyal(true);
-				}
-				return moneyAcc;
+				if (isLoyal) { moneyAcc.setLoyal(true); } return moneyAcc;
 			case COLLEGE_CHECKING:
 				RadioButton campusSelect = (RadioButton) campusToggleGroup.getSelectedToggle();
 				String campusText = campusSelect.getText();
@@ -287,8 +235,7 @@ public class Controller {
 				boolean eligible = college.isEligible();
 				if (!eligible) {
 					notifications("Not eligible to open: " + profile.getDateOfBirth() + " over 24.", false);
-					return null;
-				}
+					return null; }
 				AccountNumber number3 = new AccountNumber(branch, type);
 				college = new CollegeChecking(number3, profile, initialDeposit, campus);
 				return college;
@@ -302,13 +249,11 @@ public class Controller {
 				AccountNumber number4 = new AccountNumber(branch, type);
 				cd = new CertificateDeposit(number4, profile, initialDeposit, isLoyal, term, open);
 				return cd;
-		}
-		return null;
+		} return null;
 	}
 
 	/**
 	 * Converts the campus from the user input to the enum value
-	 *
 	 * @param campusInput the user input to convert
 	 * @return returns the correct campus relative to user input.
 	 */
@@ -328,7 +273,6 @@ public class Controller {
 
 	/**
 	 * This method is a helper method for creating an account and checks if a savings account being made has a checking account as well
-	 *
 	 * @param accountDB the account database to traverse from
 	 * @param profile   the profile to compare
 	 * @return returns true if it has a checking account, otherwise false
@@ -344,7 +288,6 @@ public class Controller {
 
 	/**
 	 * This is a private helper method for checking duplicate accounts when a user tries to open an account
-	 *
 	 * @param accountDB the database to get accounts
 	 * @param profile   the profile to compare
 	 * @param type      the account type to compare
@@ -385,7 +328,6 @@ public class Controller {
 		}
 
 		double amount;
-
 		try {
 			amount = Double.parseDouble(amountString);
 			if (amount <= 0) { notifications(amount + " - deposit amount cannot be 0 or negative.", false); return; }
@@ -412,13 +354,11 @@ public class Controller {
 			}
 		}
 		if (!accountFound) { notifications(accNumber + " does not exist.", false); }
-
 	}
 
 
 	/**
 	 * This method handles the W command (withdraw)
-	 *
 	 * @param actionEvent
 	 */
 	@FXML
@@ -427,71 +367,48 @@ public class Controller {
 		String amountString = transactionAmount.getText().trim();
 
 		if(accNumber.isEmpty() || amountString.isEmpty()) {
-			notifications("Please fill in both fields.", false);
-			return;
-		}
+			notifications("Please fill in both fields.", false); return; }
 
 		double amount;
-
-		try {
-			amount = Double.parseDouble(amountString);
+		try { amount = Double.parseDouble(amountString);
 			if(amount <= 0){
-				notifications(amountString + " withdrawal amount cannot be 0 or negative.", false);
-				return;
-			}
+				notifications(amountString + " withdrawal amount cannot be 0 or negative.", false); return; }
 		} catch (NumberFormatException e) {
-			notifications("For input string: \"" + amountString + "\" - not a valid amount.", false);
-			return;
+			notifications("For input string: \"" + amountString + "\" - not a valid amount.", false); return;
 		}
 
 		boolean accountFound = false;
-
 		for (int i = 0; i < accountDB.size(); i++) {
 			if (accountDB.get(i).getNumber().toString().replace(" ", "").equals(accNumber)) {
 				accountFound = true;
-
 				if (accountDB.get(i).getBalance() >= amount) {
 					Activity withdrawal = new Activity(new Date(), accountDB.get(i).getNumber().getBranch(), 'W', amount, false);
 					accountDB.get(i).addActivity(withdrawal);
 					accountDB.withdraw(accountDB.get(i).getNumber(), amount);
-
 					if (accountDB.get(i).getNumber().getType() == AccountType.MONEY_MARKET) {
 						MoneyMarket moneyAcc = (MoneyMarket) accountDB.get(i);
 						moneyAcc.incrementWithdrawals();
-
 						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
 							if (amount <= accountDB.get(i).getBalance()) {
-								notifications(accNumber + "\" balance below $2,000 - \" $" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true);
-							}
-						}
-						else {
-							if (amount <= accountDB.get(i).getBalance()) { notifications("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true); }
-						}
-
-						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM_FOR_LOYAL) {
-							moneyAcc.setLoyal(false);
-						}
-						return;
-					}
+								notifications(accNumber + "\" balance below $2,000 - \" $" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true); } }
+						else { if (amount <= accountDB.get(i).getBalance()) { notifications("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true); } }
+						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM_FOR_LOYAL) { moneyAcc.setLoyal(false); }
+						return; }
 					notifications("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true);
-					return;
-				}
+					return; }
 				if (amount > accountDB.get(i).getBalance() && accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
 					notifications(accNumber + " balance below $2,000 - " + "withdrawing $" + String.format("%,.2f", amount) + " - insufficient funds.", false);
-					return;
-				}
+					return; }
 				else if (amount > accountDB.get(i).getBalance()) {
-					notifications(accNumber + " - insufficient funds.", false);
-					return;
-				}
-				break;
-			}
-		}
-		if(!accountFound) { notifications(accNumber + " does not exist.", false); }
+					notifications(accNumber + " - insufficient funds.", false); return; }
+				break; } } if(!accountFound) { notifications(accNumber + " does not exist.", false); }
 	}
 
 
-
+	/**
+	 *	Closes the account based on the account number and closing date
+	 * @param actionEvent	Event triggered by user interaction.
+	 */
 	@FXML
 	private void closeAccountByNumber(ActionEvent actionEvent) {
 		if (closeDate.getValue() == null || closeAccountNumber.getText().trim().isEmpty()) {
@@ -542,8 +459,8 @@ public class Controller {
 	}
 
 	/**
-	 *
-	 * @param actionEvent
+	 *	Closes all accounts associated with a user's profile.
+	 * @param actionEvent	The event triggered by the user interaction.
 	 */
 	@FXML
 	private void closeAllAccounts(ActionEvent actionEvent) {
@@ -553,13 +470,11 @@ public class Controller {
 		Date dob = new Date(closeProfileDob.getValue().toString());
 		StringBuilder print = new StringBuilder();
 		if (closeDate.getValue() == null || fName.isEmpty() || lName.isEmpty() || closeProfileDob.getValue() == null) {
-			notifications("Fill in the required fields.", false);
-			return;
+			notifications("Fill in the required fields.", false); return;
 		}
 		double interest = 0;
 		double penalty = 0;
 		boolean found = false;
-
 		for (int i = accountDB.size() - 1; i >= 0; i--) {
 			Account account = accountDB.get(i);
 			if (account.getHolder().getFirstName().equalsIgnoreCase(fName)
@@ -583,8 +498,7 @@ public class Controller {
 				accountDB.remove(account);
 			}
 		}
-		if (!found) {
-			notifications(fName + " " + lName + " " + dob + " does not have any accounts in the database.", false);
+		if (!found) { notifications(fName + " " + lName + " " + dob + " does not have any accounts in the database.", false);
 		} else {
 			print.append("All accounts for ").append(fName).append(" ").append(lName).append(" ").append(dob).append(" are closed and moved to archive.").append("\n");
 			alert(print.toString(), true);
@@ -637,7 +551,8 @@ public class Controller {
 	}
 
 	/**
-	 * This method handles the PB command
+	 * This method handles the PB command.
+	 * @param actionEvent The event triggered by the user interaction.
 	 */
 	@FXML
 	private void printByBranch(ActionEvent actionEvent) {
@@ -649,7 +564,8 @@ public class Controller {
 	}
 
 	/**
-	 * This method handles the PT command
+	 * This method handles the PT command.
+	 * @param actionEvent The event triggered by the user interaction.
 	 */
 	@FXML
 	private void printByType(ActionEvent actionEvent) {
@@ -664,6 +580,7 @@ public class Controller {
 
 	/**
 	 * This method handles the PH command
+	 * @param actionEvent The event triggered by the user interaction.
 	 */
 	@FXML
 	private void printByHolder(ActionEvent actionEvent) {
@@ -676,7 +593,8 @@ public class Controller {
 
 
 	/**
-	 *  This method handles the  PS command
+	 * This method handles the PS command.
+	 * @param actionEvent	The event triggered by the user interaction.
 	 */
 	@FXML
 	private void printStatements(ActionEvent actionEvent) {
@@ -689,6 +607,7 @@ public class Controller {
 
 	/**
 	 *  This method handles the PA command.
+	 * @param actionEvent The event triggered by the user interaction.
 	 */
 	@FXML
 	private void printArchive(ActionEvent actionEvent) {
@@ -700,8 +619,8 @@ public class Controller {
 	}
 
 	/**
-	 *
-	 * @param actionEvent
+	 *	This method resets the selections in the account creation form.
+	 * @param actionEvent The event triggered by the user interaction.
 	 */
 	@FXML
 	private void clearFields(ActionEvent actionEvent) {
@@ -717,6 +636,10 @@ public class Controller {
 		loyalCustomerCheckBox.setSelected(false);
 	}
 
+	/**
+	 *	Loads account data from a text file into the database.
+	 * @param actionEvent
+	 */
 	@FXML
 	private void loadAccounts(ActionEvent actionEvent) {
 		FileChooser fileChooser = new FileChooser();
@@ -733,7 +656,6 @@ public class Controller {
 				outputTextArea.setText("Error processing accounts: " + e.getMessage());
 			}
 		}
-
 	}
 
 	/**
@@ -806,9 +728,9 @@ public class Controller {
 
 
 	/**
-	 *
-	 * @param message
-	 * @param success
+	 *	Displays a temporary notification based on the user's actions.
+	 * @param message	The message displayed in the notification.
+	 * @param success	If true, the notification is green. Otherwise, the notification is red.
 	 */
 	private void notifications(String message, boolean success) {
 		Label label = new Label(message);
@@ -828,16 +750,13 @@ public class Controller {
 			notificationContainer.setId("notificationContainer");
 			root.setBottom(notificationContainer);
 		}
-
 		notificationContainer.getChildren().add(notification);
-
 		notification.setTranslateX(200);
 		Timeline timeline = new Timeline();
 		KeyValue keyValue = new KeyValue(notification.translateXProperty(), 0, Interpolator.EASE_IN);
 		KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.5), keyValue);
 		timeline.getKeyFrames().add(keyFrame);
 		timeline.play();
-
 		FadeTransition fade = new FadeTransition(Duration.seconds(2), label);
 		fade.setFromValue(1.0);
 		fade.setToValue(0.0);
@@ -849,16 +768,17 @@ public class Controller {
 			delay.setOnFinished(f -> finalNotificationContainer.getChildren().remove(notification));
 			delay.play();
 		});
-
 		PauseTransition delay = new PauseTransition(Duration.seconds(2));
 		delay.setOnFinished(e -> fade.play());
 		delay.play();
 	}
 
 	/**
-	 *
-	 * @param message
-	 * @param success
+	 *	This method displays an alert to tell the user whether their action
+	 *  was successful or unsuccessful.
+	 * @param message	The message displayed by the alert.
+	 * @param success	If true, the alert is an information dialog,
+	 *                  else it's an error dialog.
 	 */
 	private void alert(String message, boolean success) {
 		Alert alert = new Alert(success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR);
@@ -869,7 +789,7 @@ public class Controller {
 	}
 
 	/**
-	 *
+	 * Initializes the controller when the FXML file is loaded.
 	 */
 	public void initialize() {
 		accountDB = new AccountDatabase();
@@ -901,7 +821,6 @@ public class Controller {
 		accountTypeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			hideElements(newValue);
 		});
-
 	}
 
 }
