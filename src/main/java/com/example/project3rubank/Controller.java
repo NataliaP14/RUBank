@@ -93,13 +93,18 @@ public class Controller {
 	 * @return The string representation of the account type.
 	 */
 	private String changeAccountTypeFormat(AccountType type) {
-		return switch (type) {
-			case CHECKING -> "Checking";
-			case COLLEGE_CHECKING -> "College Checking";
-			case SAVINGS -> "Savings";
-			case MONEY_MARKET -> "Money Market";
-			case CD -> "Certificate Deposit";
-		};
+
+		try {
+			return switch (type) {
+				case CHECKING -> "Checking";
+				case COLLEGE_CHECKING -> "College Checking";
+				case SAVINGS -> "Savings";
+				case MONEY_MARKET -> "Money Market";
+				case CD -> "Certificate Deposit";
+			};
+		} catch (NullPointerException e) {
+			return "Account Type";
+		}
 	}
 
 
@@ -780,6 +785,21 @@ public class Controller {
 	}
 
 	/**
+	 * This changes the branch selection after clearing fields.
+	 * @param branch the branch to switch to
+	 * @return returns the branch
+	 */
+	private String changeBranch(Branch branch) {
+		return switch (branch) {
+			case EDISON -> "EDISON";
+			case BRIDGEWATER -> "BRIDGEWATER";
+			case PRINCETON-> "PRINCETON";
+			case PISCATAWAY -> "PISCATAWAY";
+			case WARREN -> "WARREN";
+		};
+	}
+
+	/**
 	 * Initializes the controller when the FXML file is loaded.
 	 */
 	public void initialize() {
@@ -791,8 +811,10 @@ public class Controller {
 		if (termsToggleGroup == null) {
 			termsToggleGroup = new ToggleGroup();
 		}
+
 		ObservableList<AccountType> types = FXCollections.observableArrayList(AccountType.values());
 		accountTypeComboBox.setItems(types);
+
 
 		accountTypeComboBox.setCellFactory(ListView -> new ListCell<AccountType>() {
 			@Override
@@ -806,18 +828,39 @@ public class Controller {
 			@Override
 			protected void updateItem(AccountType type, boolean empty) {
 				super.updateItem(type, empty);
-				setText((empty || type == null) ? null : changeAccountTypeFormat(type));
+				if (empty || type == null) {
+					setText("Account Type");
+				} else {
+					setText(changeAccountTypeFormat(type));
+				}
 			}
 		});
 
 		ObservableList<Branch> branches = FXCollections.observableArrayList(Branch.values());
 		branchComboBox.setItems(branches);
 
+		branchComboBox.setButtonCell(new ListCell<Branch>() {
+			@Override
+			protected void updateItem(Branch branch, boolean empty) {
+				super.updateItem(branch, empty);
+				if (empty || branch == null) {
+					setText("Branch");
+				} else {
+					setText(changeBranch(branch));
+				}
+			}
+		});
+
 		accountTypeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			hideElements(newValue);
+			if (newValue != null) {
+				hideElements(newValue);
+
+			}
 		});
 
 
 	}
+
+
 
 }
