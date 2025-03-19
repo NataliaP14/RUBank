@@ -715,8 +715,8 @@ public class Controller {
 	}
 
 	/**
-	 *
-	 * @param actionEvent
+	 *	This methods loads the activities from the selected file.
+	 * @param actionEvent	The event triggered by the user interaction.
 	 */
 	@FXML
 	private void loadActivities(ActionEvent actionEvent) {
