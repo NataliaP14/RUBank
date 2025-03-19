@@ -75,7 +75,7 @@ public abstract class Account implements Comparable<Account> {
         StringBuilder print = new StringBuilder();
 
         if (activities.isEmpty()) return "";
-        print.append("\t[Activity]");
+        print.append("\t[Activity]\n");
             for(Activity activity: activities) {
                 print.append("\t\t").append(activity).append("\n");
             }

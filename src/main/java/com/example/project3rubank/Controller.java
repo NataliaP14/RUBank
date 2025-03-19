@@ -516,6 +516,10 @@ public class Controller {
 					print.append("--interest earned: $").append(String.format("%,.2f", interest)).append("\n");
 				} else {
 					CertificateDeposit cd = (CertificateDeposit) account;
+					if (close.compareTo(cd.getOpen()) < 0) {
+						notifications("Closing date is earlier than the opening date of the Certificate Deposit account, please choose a date that is after.", false); return;
+					}
+
 					interest = cd.calculateClosingInterest(close);
 					if (close.compareTo(cd.getMaturityDate()) < 0) {
 						penalty = cd.calculatePenalty(close);
@@ -571,6 +575,9 @@ public class Controller {
 				}
 				if (account.getNumber().getType() == AccountType.CD) {
 					CertificateDeposit cd = (CertificateDeposit) account;
+					if (close.compareTo(cd.getOpen()) < 0) {
+						notifications("Closing date is earlier than the opening date of the Certificate Deposit account, please choose a date that is after.", false); return;
+					}
 					interest = cd.calculateClosingInterest(close);
 					penalty = cd.calculatePenalty(close);
 					print.append("--").append(account.getNumber()).append(" interest earned: ").append(String.format("$%,.2f", interest)).append("\n");
@@ -720,7 +727,7 @@ public class Controller {
 	@FXML
 	private void loadAccounts(ActionEvent actionEvent) {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Acccounts File");
+		fileChooser.setTitle("Open Accounts File");
 		FileChooser.ExtensionFilter txtFilter = new FileChooser.ExtensionFilter("Text Files (*.txt)", "*.txt");
 		fileChooser.getExtensionFilters().add(txtFilter);
 		File file = fileChooser.showOpenDialog(new Stage());
@@ -730,7 +737,9 @@ public class Controller {
 				accountDB.loadAccounts(file);
 				outputTextArea.setText("Accounts in " + file.getName() + " loaded to the database.");
 			} catch (IOException e) {
-				outputTextArea.setText("Error processing accounts: " + e.getMessage());
+				outputTextArea.setText("Error loading accounts, please select a file in the correct format.");
+			} catch (Exception e) {
+				outputTextArea.setText("Error loading accounts, The file you selected is not in the correct format");
 			}
 		}
 
@@ -799,7 +808,9 @@ public class Controller {
 			try {
 				outputTextArea.setText(printActivities(file));
 			} catch (IOException e) {
-				outputTextArea.setText("Error processing activities: " + e.getMessage());
+				outputTextArea.setText("Error loading activities, please select a file that is in the correct format. ");
+			} catch (Exception e) {
+				outputTextArea.setText("Error loading activities, please select a file that is in the correct format!");
 			}
 		}
 	}
