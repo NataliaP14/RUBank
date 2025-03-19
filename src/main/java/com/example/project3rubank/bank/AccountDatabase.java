@@ -75,7 +75,7 @@ public class AccountDatabase extends List<Account> {
                 if (prevProfile != null) {
                     print.append("");
                 }
-                print.append("\n").append(count).append(".").append(profile.getFirstName()).append(" ").append(profile.getLastName()).append(" ").append(profile.getDateOfBirth()).append("\n");
+                print.append("\n").append(count).append(". ").append(profile.getFirstName()).append(" ").append(profile.getLastName()).append(" ").append(profile.getDateOfBirth()).append("\n");
             } else {
                 print.append("");
             }
@@ -98,35 +98,64 @@ public class AccountDatabase extends List<Account> {
     public void loadAccounts(File file) throws IOException {
         Scanner scanner = new Scanner(file);
         while (scanner.hasNextLine()) {
-            StringTokenizer token = new StringTokenizer(scanner.nextLine(), ",");
-            String type = token.nextToken().toLowerCase(); String branchTxt = token.nextToken(); // branch and type
-            String fName = token.nextToken(); String lName = token.nextToken();
-            String dateString = token.nextToken();
-            String[] parts = dateString.split("/");
-            String newDate = parts[2] + "-" + parts[0] + "-" + parts[1];
-            Date dob = new Date(newDate);
-            Double balance = Double.parseDouble(token.nextToken());
-            Profile holder = new Profile(fName, lName, dob);
-            Branch branch = Branch.valueOf(branchTxt.toUpperCase());
-            AccountNumber number = null; Account account = null; boolean isLoyal = false;
+            try {
+                StringTokenizer token = new StringTokenizer(scanner.nextLine(), ",");
+                String type = token.nextToken().toLowerCase();
+                String branchTxt = token.nextToken(); // branch and type
+                String fName = token.nextToken();
+                String lName = token.nextToken();
+                String dateString = token.nextToken();
+                String[] parts = dateString.split("/");
+                String newDate = parts[2] + "-" + parts[0] + "-" + parts[1];
+                Date dob = new Date(newDate);
+                Double balance = Double.parseDouble(token.nextToken());
+                Profile holder = new Profile(fName, lName, dob);
+                Branch branch = Branch.valueOf(branchTxt.toUpperCase());
+                AccountNumber number = null;
+                Account account = null;
+                boolean isLoyal = false;
 
-            switch (type) {
-                case "checking":  number = new AccountNumber(branch, AccountType.CHECKING); account = new Checking(number, holder, balance); break;
-                case "savings": number = new AccountNumber(branch, AccountType.SAVINGS); account = new Savings(number, holder, balance, isLoyal); break;
-                case "moneymarket": number = new AccountNumber(branch, AccountType.MONEY_MARKET); account = new MoneyMarket(number, holder, balance, isLoyal); break;
-                case "college": number = new AccountNumber(branch, AccountType.COLLEGE_CHECKING);String campusCode = token.nextToken();
-                    Campus campus = null;
-                    for (Campus c : Campus.values()) { if (c.getCode().equals(campusCode)) { campus = c; break; } }
-                    account = new CollegeChecking(number, holder, balance, campus);break;
-                case "certificate": number = new AccountNumber(branch, AccountType.CD);int term = Integer.parseInt(token.nextToken());
-                String str = token.nextToken();
-                String[] dateSplit = str.split("/");
-                String newCDDate = dateSplit[2] + '-' + dateSplit[0] + "-" + dateSplit[1];
-                Date open = new Date(newCDDate);
-                account = new CertificateDeposit(number, holder, balance, isLoyal, term, open);
+                switch (type) {
+                    case "checking":
+                        number = new AccountNumber(branch, AccountType.CHECKING);
+                        account = new Checking(number, holder, balance);
+                        break;
+                    case "savings":
+                        number = new AccountNumber(branch, AccountType.SAVINGS);
+                        account = new Savings(number, holder, balance, isLoyal);
+                        break;
+                    case "moneymarket":
+                        number = new AccountNumber(branch, AccountType.MONEY_MARKET);
+                        account = new MoneyMarket(number, holder, balance, isLoyal);
+                        break;
+                    case "college":
+                        number = new AccountNumber(branch, AccountType.COLLEGE_CHECKING);
+                        String campusCode = token.nextToken();
+                        Campus campus = null;
+                        for (Campus c : Campus.values()) {
+                            if (c.getCode().equals(campusCode)) {
+                                campus = c;
+                                break;
+                            }
+                        }
+                        account = new CollegeChecking(number, holder, balance, campus);
+                        break;
+                    case "certificate":
+                        number = new AccountNumber(branch, AccountType.CD);
+                        int term = Integer.parseInt(token.nextToken());
+                        String str = token.nextToken();
+                        String[] dateSplit = str.split("/");
+                        String newCDDate = dateSplit[2] + '-' + dateSplit[0] + "-" + dateSplit[1];
+                        Date open = new Date(newCDDate);
+                        account = new CertificateDeposit(number, holder, balance, isLoyal, term, open);
 
+                }
+                if (account != null) {
+                    this.add(account);
+                }
+            } catch (Exception e) {
+                throw new IOException(e);
             }
-            if (account != null) { this.add(account); }
         }
         scanner.close();
 
@@ -155,42 +184,47 @@ public class AccountDatabase extends List<Account> {
         Scanner scanner = new Scanner(file);
 
         while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
+            try {
+                String line = scanner.nextLine();
 
-            StringTokenizer token = new StringTokenizer(line, ",");
-            char type = token.nextToken().charAt(0);
-            String number = token.nextToken();
-            String dateString = token.nextToken();
-            String[] parts = dateString.split("/");
-            String newDate = parts[2] + '-' + parts[0] + "-" + parts[1];
-            Date date = new Date(newDate);
-            String branchTxt = token.nextToken().toLowerCase();
-            int amount = Integer.parseInt(token.nextToken());
-            Branch location = Branch.valueOf(branchTxt.toUpperCase());
-            boolean atm = true;
-            Activity activity = new Activity(date, location, type, amount, atm);
+                StringTokenizer token = new StringTokenizer(line, ",");
+                char type = token.nextToken().charAt(0);
+                String number = token.nextToken();
+                String dateString = token.nextToken();
+                String[] parts = dateString.split("/");
+                String newDate = parts[2] + '-' + parts[0] + "-" + parts[1];
+                Date date = new Date(newDate);
+                String branchTxt = token.nextToken().toLowerCase();
+                int amount = Integer.parseInt(token.nextToken());
+                Branch location = Branch.valueOf(branchTxt.toUpperCase());
+                boolean atm = true;
+                Activity activity = new Activity(date, location, type, amount, atm);
 
 
-            Account account = null;
-            for (int i = 0; i < this.size(); i++) {
-                if (this.get(i).getNumber().toString().equals(number)) {
-                    account = this.get(i);
-                    account.addActivity(activity);
-                    break;
-                }
-            }
-            if (account != null) {
-                if (type == 'D') {
-                    account.deposit(amount);
-                } else if (type == 'W') {
-                    account.withdraw(amount);
-                    if (account.getNumber().getType() == AccountType.MONEY_MARKET) {
-                        MoneyMarket moneyAcc = (MoneyMarket) account;
-                        moneyAcc.incrementWithdrawals();
-
+                Account account = null;
+                for (int i = 0; i < this.size(); i++) {
+                    if (this.get(i).getNumber().toString().equals(number)) {
+                        account = this.get(i);
+                        account.addActivity(activity);
+                        break;
                     }
                 }
+                if (account != null) {
+                    if (type == 'D') {
+                        account.deposit(amount);
+                    } else if (type == 'W') {
+                        account.withdraw(amount);
+                        if (account.getNumber().getType() == AccountType.MONEY_MARKET) {
+                            MoneyMarket moneyAcc = (MoneyMarket) account;
+                            moneyAcc.incrementWithdrawals();
+
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new IOException(e);
             }
+
         }
         scanner.close();
     }

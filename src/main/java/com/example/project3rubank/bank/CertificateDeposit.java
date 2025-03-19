@@ -212,6 +212,14 @@ public class CertificateDeposit extends Savings {
 	}
 
 	/**
+	 *  Gets the open date for the account
+	 * @return the open date for cd account.
+	 */
+	public Date getOpen() {
+		return open;
+	}
+
+	/**
 	 *  Returns a string representation of the CD account information
 	 *  (including Term, Date opened and Maturity date details).
 	 *
