@@ -88,7 +88,6 @@ public class AccountDatabase extends List<Account> {
         return print.toString();
     }
 
-
     /**
      * This method is used to load the accounts into the database from the accounts.txt file.
      *
@@ -114,58 +113,22 @@ public class AccountDatabase extends List<Account> {
                 AccountNumber number = null;
                 Account account = null;
                 boolean isLoyal = false;
-
                 switch (type) {
-                    case "checking":
-                        number = new AccountNumber(branch, AccountType.CHECKING);
-                        account = new Checking(number, holder, balance);
-                        break;
-                    case "savings":
-                        number = new AccountNumber(branch, AccountType.SAVINGS);
-                        account = new Savings(number, holder, balance, isLoyal);
-                        break;
-                    case "moneymarket":
-                        number = new AccountNumber(branch, AccountType.MONEY_MARKET);
-                        account = new MoneyMarket(number, holder, balance, isLoyal);
-                        break;
-                    case "college":
-                        number = new AccountNumber(branch, AccountType.COLLEGE_CHECKING);
-                        String campusCode = token.nextToken();
-                        Campus campus = null;
-                        for (Campus c : Campus.values()) {
-                            if (c.getCode().equals(campusCode)) {
-                                campus = c;
-                                break;
-                            }
-                        }
-                        account = new CollegeChecking(number, holder, balance, campus);
-                        break;
-                    case "certificate":
-                        number = new AccountNumber(branch, AccountType.CD);
-                        int term = Integer.parseInt(token.nextToken());
-                        String str = token.nextToken();
-                        String[] dateSplit = str.split("/");
-                        String newCDDate = dateSplit[2] + '-' + dateSplit[0] + "-" + dateSplit[1];
-                        Date open = new Date(newCDDate);
-                        account = new CertificateDeposit(number, holder, balance, isLoyal, term, open);
-
+                    case "checking": number = new AccountNumber(branch, AccountType.CHECKING); account = new Checking(number, holder, balance); break;
+                    case "savings": number = new AccountNumber(branch, AccountType.SAVINGS);account = new Savings(number, holder, balance, isLoyal);break;
+                    case "moneymarket": number = new AccountNumber(branch, AccountType.MONEY_MARKET);account = new MoneyMarket(number, holder, balance, isLoyal);break;
+                    case "college": number = new AccountNumber(branch, AccountType.COLLEGE_CHECKING);String campusCode = token.nextToken();Campus campus = null;for (Campus c : Campus.values()) {if (c.getCode().equals(campusCode)) {campus = c;break;}} account = new CollegeChecking(number, holder, balance, campus); break;
+                    case "certificate": number = new AccountNumber(branch, AccountType.CD);int term = Integer.parseInt(token.nextToken());String str = token.nextToken();String[] dateSplit = str.split("/");String newCDDate = dateSplit[2] + '-' + dateSplit[0] + "-" + dateSplit[1];Date open = new Date(newCDDate);account = new CertificateDeposit(number, holder, balance, isLoyal, term, open);
                 }
-                if (account != null) {
-                    this.add(account);
-                }
-            } catch (Exception e) {
-                throw new IOException(e);
-            }
+                if (account != null) { this.add(account); }
+            } catch (Exception e) { throw new IOException(e); }
         }
         scanner.close();
 
         for (int i = 0; i < this.size(); i++) {
-            if (get(i).getNumber().getType() == AccountType.SAVINGS) { Savings savingsAcc = (Savings) this.get(i); Profile holder = savingsAcc.getHolder();
-                boolean hasChecking = false;
-                for (int j = 0; j < this.size(); j++) { if (get(j).getHolder().equals(holder) && (get(j).getNumber().getType() == AccountType.CHECKING)) { hasChecking = true;break;}
-                }
-                savingsAcc.setLoyal(hasChecking);
-            }
+            if (get(i).getNumber().getType() == AccountType.SAVINGS) { Savings savingsAcc = (Savings) this.get(i); Profile holder = savingsAcc.getHolder(); boolean hasChecking = false;
+                for (int j = 0; j < this.size(); j++) { if (get(j).getHolder().equals(holder) && (get(j).getNumber().getType() == AccountType.CHECKING)) { hasChecking = true;break;}}
+                savingsAcc.setLoyal(hasChecking); }
 
             if (get(i).getNumber().getType() == AccountType.MONEY_MARKET) { MoneyMarket moneyAcc = (MoneyMarket) this.get(i);
                 if (moneyAcc.getBalance() >= 5000) { moneyAcc.setLoyal(true); }
@@ -182,11 +145,9 @@ public class AccountDatabase extends List<Account> {
      */
     public void processActivities(File file) throws IOException {
         Scanner scanner = new Scanner(file);
-
         while (scanner.hasNextLine()) {
             try {
                 String line = scanner.nextLine();
-
                 StringTokenizer token = new StringTokenizer(line, ",");
                 char type = token.nextToken().charAt(0);
                 String number = token.nextToken();
@@ -200,30 +161,21 @@ public class AccountDatabase extends List<Account> {
                 boolean atm = true;
                 Activity activity = new Activity(date, location, type, amount, atm);
 
-
                 Account account = null;
                 for (int i = 0; i < this.size(); i++) {
-                    if (this.get(i).getNumber().toString().equals(number)) {
-                        account = this.get(i);
-                        account.addActivity(activity);
-                        break;
+                    if (this.get(i).getNumber().toString().equals(number)) { account = this.get(i);account.addActivity(activity);break;
                     }
                 }
                 if (account != null) {
-                    if (type == 'D') {
-                        account.deposit(amount);
-                    } else if (type == 'W') {
-                        account.withdraw(amount);
+                    if (type == 'D') { account.deposit(amount);
+                    } else if (type == 'W') { account.withdraw(amount);
                         if (account.getNumber().getType() == AccountType.MONEY_MARKET) {
                             MoneyMarket moneyAcc = (MoneyMarket) account;
                             moneyAcc.incrementWithdrawals();
-
                         }
                     }
                 }
-            } catch (Exception e) {
-                throw new IOException(e);
-            }
+            } catch (Exception e) { throw new IOException(e); }
 
         }
         scanner.close();

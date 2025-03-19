@@ -77,7 +77,7 @@ public class Archive {
         print.append("\n*List of closed accounts in the archive.").append("\n");
 
         while (currentNode != null) {
-            print.append(currentNode).append("\n");
+            print.append(currentNode).append("\n\n");
             currentNode = currentNode.next;
         }
         print.append("*end of list.\n");

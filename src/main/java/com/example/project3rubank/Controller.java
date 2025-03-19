@@ -2,13 +2,11 @@ package com.example.project3rubank;
 
 import com.example.project3rubank.bank.*;
 import com.example.project3rubank.util.List;
-import com.example.project3rubank.util.Sort;
 import javafx.animation.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import com.example.project3rubank.util.Date;
 import javafx.scene.layout.*;
@@ -17,11 +15,8 @@ import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.util.StringConverter;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -98,13 +93,18 @@ public class Controller {
 	 * @return The string representation of the account type.
 	 */
 	private String changeAccountTypeFormat(AccountType type) {
-		return switch (type) {
-			case CHECKING -> "Checking";
-			case COLLEGE_CHECKING -> "College Checking";
-			case SAVINGS -> "Savings";
-			case MONEY_MARKET -> "Money Market";
-			case CD -> "Certificate Deposit";
-		};
+
+		try {
+			return switch (type) {
+				case CHECKING -> "Checking";
+				case COLLEGE_CHECKING -> "College Checking";
+				case SAVINGS -> "Savings";
+				case MONEY_MARKET -> "Money Market";
+				case CD -> "Certificate Deposit";
+			};
+		} catch (NullPointerException e) {
+			return "Account Type";
+		}
 	}
 
 
@@ -165,82 +165,34 @@ public class Controller {
 		String term = null;
 		String dateOfBirth;
 		RadioButton termSelected = (RadioButton) termsToggleGroup.getSelectedToggle();
-		if (termSelected != null) {
-			term = termSelected.getText();
-		}
-		if (firstName.isEmpty() || lastName.isEmpty() || type == null || branch == null || dobValue.getValue() == null) {
-			notifications("Fill in the required fields.", false);
-			return;
-		}
+		if (termSelected != null) {term = termSelected.getText();}
+		if (firstName.isEmpty() || lastName.isEmpty() || type == null || branch == null || dobValue.getValue() == null) { notifications("Fill in the required fields.", false); return; }
 		dateOfBirth = dobValue.getValue().toString();
 		Date dob = new Date(dateOfBirth);
-		if (!dob.isValid()) {
-			notifications("DOB invalid: " + dob + " not a valid calendar date!", false);
-			return;
-		}
-		if (dob.compareTo(new Date()) > 0) {
-			notifications("DOB invalid: " + dob + " cannot be today or a future day.", false);
-			return;
-		}
-		if (!dob.isAdult()) {
-			notifications("Not eligible to open: " + dob + " under 18.", false);
-			return;
-		}
+		if (!dob.isValid()) { notifications("DOB invalid: " + dob + " not a valid calendar date!", false); return; }
+		if (dob.compareTo(new Date()) > 0) { notifications("DOB invalid: " + dob + " cannot be today or a future day.", false); return; }
+		if (!dob.isAdult()) { notifications("Not eligible to open: " + dob + " under 18.", false); return;}
 
 		Profile profile = new Profile(firstName, lastName, dob);
 		String amountStr = initialDeposit.getText().trim();
 		double initialDeposit = 0.0;
-		try {
-			initialDeposit = Double.parseDouble(amountStr);
-		} catch (NumberFormatException e) {
-			notifications("For input string: \"" + amountStr + "\" - not a valid amount.", false);
-			return;
-		}
+		try { initialDeposit = Double.parseDouble(amountStr); } catch (NumberFormatException e) { notifications("For input string: \"" + amountStr + "\" - not a valid amount.", false); return; }
 
-		if (type == AccountType.CD && term == null) {
-			notifications("Missing term for CD Account", false);
-			return;
-		}
-		if (type == AccountType.CD && cdDateOpen.getValue() == null) {
-			notifications("Missing opening date for CD account", false);
-			return;
-		}
+		if (type == AccountType.CD && term == null) { notifications("Missing term for CD Account", false); return; }
+		if (type == AccountType.CD && cdDateOpen.getValue() == null) { notifications("Missing opening date for CD account", false); return; }
 
 		RadioButton campusSelect = (RadioButton) campusToggleGroup.getSelectedToggle();
-		if (type == AccountType.COLLEGE_CHECKING && campusSelect == null) {
-			notifications("Missing campus for college account", false);
-			return;
-		}
+		if (type == AccountType.COLLEGE_CHECKING && campusSelect == null) { notifications("Missing campus for college account", false); return; }
 		int termNumber = 0;
-		if (term != null) {
-			try {
-				termNumber = Integer.parseInt(term);
-			} catch (NumberFormatException e) {
-				return;
-			}
-		}
+		if (term != null) { try { termNumber = Integer.parseInt(term); } catch (NumberFormatException e) { return; } }
 
 		Account duplicateAccount = findDuplicateAccount(accountDB, profile, type, termNumber);
-		if (duplicateAccount != null && accountDB.contains(duplicateAccount)) {
-			notifications(firstName + " " + lastName + " already has a " + type + " account.", false);
-			return;
-		}
-		if (type == AccountType.MONEY_MARKET && initialDeposit < MONEY_MARKET_MINIMUM) {
-			notifications("Minimum of $2,000 to open a Money Market account.", false);
-			return;
-		}
-		if (type == AccountType.CD && initialDeposit < CertificateDeposit.MIN_BALANCE) {
-			notifications("Minimum of $1,000 to open a Certificate Deposit account.", false);
-			return;
-		}
-		if (initialDeposit <= 0) {
-			notifications("Initial deposit cannot be 0 or negative.", false);
-			return;
-		}
+		if (duplicateAccount != null && accountDB.contains(duplicateAccount)) { notifications(firstName + " " + lastName + " already has a " + type + " account.", false); return; }
+		if (type == AccountType.MONEY_MARKET && initialDeposit < MONEY_MARKET_MINIMUM) { notifications("Minimum of $2,000 to open a Money Market account.", false); return; }
+		if (type == AccountType.CD && initialDeposit < CertificateDeposit.MIN_BALANCE) { notifications("Minimum of $1,000 to open a Certificate Deposit account.", false); return; }
+		if (initialDeposit <= 0) { notifications("Initial deposit cannot be 0 or negative.", false); return; }
 		Account account = createAccount(accountDB, type, branch, profile, initialDeposit, termNumber);
-		if (account == null) {
-			return;
-		}
+		if (account == null) { return; }
 		accountDB.add(account);
 		notifications(type + " account " + account.getNumber() + " has been opened.", true);
 	}
@@ -266,17 +218,13 @@ public class Controller {
 				AccountNumber number1 = new AccountNumber(branch, type);
 				Savings savingsAcc = new Savings(number1, profile, initialDeposit, isLoyal);
 				isLoyal = hasChecking(accountDB, profile);
-				if (isLoyal) {
-					savingsAcc.setLoyal(true);
-				}
+				if (isLoyal) { savingsAcc.setLoyal(true); }
 				return savingsAcc;
 			case MONEY_MARKET:
 				AccountNumber number2 = new AccountNumber(branch, type);
 				isLoyal = initialDeposit >= MONEY_MARKET_MINIMUM_FOR_LOYAL;
 				MoneyMarket moneyAcc = new MoneyMarket(number2, profile, initialDeposit, isLoyal);
-				if (isLoyal) {
-					moneyAcc.setLoyal(true);
-				}
+				if (isLoyal) { moneyAcc.setLoyal(true); }
 				return moneyAcc;
 			case COLLEGE_CHECKING:
 				RadioButton campusSelect = (RadioButton) campusToggleGroup.getSelectedToggle();
@@ -285,20 +233,14 @@ public class Controller {
 				campus = convertCampus(campusText);
 				CollegeChecking college = new CollegeChecking(null, profile, initialDeposit, campus);
 				boolean eligible = college.isEligible();
-				if (!eligible) {
-					notifications("Not eligible to open: " + profile.getDateOfBirth() + " over 24.", false);
-					return null;
-				}
+				if (!eligible) { notifications("Not eligible to open: " + profile.getDateOfBirth() + " over 24.", false); return null; }
 				AccountNumber number3 = new AccountNumber(branch, type);
 				college = new CollegeChecking(number3, profile, initialDeposit, campus);
 				return college;
 			case CD:
 				Date open = new Date(cdDateOpen.getValue().toString());
 				CertificateDeposit cd = null;
-				if (open.compareTo(new Date()) > 0) {
-					notifications("DOB invalid: " + open + " cannot be today or a future day.", false);
-					return null;
-				}
+				if (open.compareTo(new Date()) > 0) { notifications("DOB invalid: " + open + " cannot be today or a future day.", false); return null; }
 				AccountNumber number4 = new AccountNumber(branch, type);
 				cd = new CertificateDeposit(number4, profile, initialDeposit, isLoyal, term, open);
 				return cd;
@@ -388,37 +330,27 @@ public class Controller {
 		double amount;
 		try {
 			amount = Double.parseDouble(amountString);
-			if (amount <= 0) {
-				notifications(amount + " - deposit amount cannot be 0 or negative.", false);
-				return;
-			}
+			if (amount <= 0) { notifications(amount + " - deposit amount cannot be 0 or negative.", false); return; }
 		} catch (NumberFormatException e) {
-			notifications("For input string: \"" + amountString + "\" - not a valid amount.", false);
-			return;
-		}
+			notifications("For input string: \"" + amountString + "\" - not a valid amount.", false); return; }
 		boolean accountFound = false;
 
 		for (int i = 0; i < accountDB.size(); i++) {
 			if (accountDB.get(i).getNumber().toString().equals(accNumber)) {
 				accountFound = true;
 				accountDB.deposit(accountDB.get(i).getNumber(), amount);
-				notifications("$" + String.format("%,.2f", amount) +
-						" deposited to " + accNumber, true);
+				notifications("$" + String.format("%,.2f", amount) + " deposited to " + accNumber, true);
 
 				if (accountDB.get(i).getNumber().getType() == AccountType.MONEY_MARKET) {
 					MoneyMarket moneyAcc = (MoneyMarket) accountDB.get(i);
-					if (accountDB.get(i).getBalance() > MONEY_MARKET_MINIMUM_FOR_LOYAL) {
-						moneyAcc.setLoyal(true);
-					}
+					if (accountDB.get(i).getBalance() > MONEY_MARKET_MINIMUM_FOR_LOYAL) { moneyAcc.setLoyal(true); }
 				}
 				Activity deposit = new Activity(new Date(), accountDB.get(i).getNumber().getBranch(), 'D', amount, false);
 				accountDB.get(i).addActivity(deposit);
 				break;
 			}
 		}
-		if (!accountFound) {
-			notifications(accNumber + " does not exist.", false);
-		}
+		if (!accountFound) { notifications(accNumber + " does not exist.", false); }
 	}
 
 
@@ -432,23 +364,12 @@ public class Controller {
 		String accNumber = accountNumber.getText().trim();
 		String amountString = transactionAmount.getText().trim();
 
-		if (accNumber.isEmpty() || amountString.isEmpty()) {
-			notifications("Please fill in both fields.", false);
-			return;
-		}
+		if (accNumber.isEmpty() || amountString.isEmpty()) { notifications("Please fill in both fields.", false); return; }
 
 		double amount;
-		try {
-			amount = Double.parseDouble(amountString);
-			if (amount <= 0) {
-				notifications(amountString + " withdrawal amount cannot be 0 or negative.", false);
-				return;
-			}
-		} catch (NumberFormatException e) {
-			notifications("For input string: \"" + amountString + "\" - not a valid amount.", false);
-			return;
-		}
-
+		try { amount = Double.parseDouble(amountString);
+			if (amount <= 0) { notifications(amountString + " withdrawal amount cannot be 0 or negative.", false); return; }
+		} catch (NumberFormatException e) { notifications("For input string: \"" + amountString + "\" - not a valid amount.", false); return;}
 		boolean accountFound = false;
 		for (int i = 0; i < accountDB.size(); i++) {
 			if (accountDB.get(i).getNumber().toString().replace(" ", "").equals(accNumber)) {
@@ -461,35 +382,21 @@ public class Controller {
 						MoneyMarket moneyAcc = (MoneyMarket) accountDB.get(i);
 						moneyAcc.incrementWithdrawals();
 						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
-							if (amount <= accountDB.get(i).getBalance()) {
-								notifications(accNumber + "\" balance below $2,000 - \" $" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true);
-							}
+							if (amount <= accountDB.get(i).getBalance()) { notifications(accNumber + "\" balance below $2,000 - \" $" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true); }
 						} else {
-							if (amount <= accountDB.get(i).getBalance()) {
-								notifications("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true);
-							}
+							if (amount <= accountDB.get(i).getBalance()) { notifications("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true); }
 						}
-						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM_FOR_LOYAL) {
-							moneyAcc.setLoyal(false);
-						}
-						return;
+						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM_FOR_LOYAL) { moneyAcc.setLoyal(false); } return;
 					}
-					notifications("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true);
-					return;
+					notifications("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true); return;
 				}
-				if (amount > accountDB.get(i).getBalance() && accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
-					notifications(accNumber + " balance below $2,000 - " + "withdrawing $" + String.format("%,.2f", amount) + " - insufficient funds.", false);
-					return;
-				} else if (amount > accountDB.get(i).getBalance()) {
-					notifications(accNumber + " - insufficient funds.", false);
-					return;
+				if (amount > accountDB.get(i).getBalance() && accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) { notifications(accNumber + " balance below $2,000 - " + "withdrawing $" + String.format("%,.2f", amount) + " - insufficient funds.", false); return;
+				} else if (amount > accountDB.get(i).getBalance()) { notifications(accNumber + " - insufficient funds.", false); return;
 				}
 				break;
 			}
 		}
-		if (!accountFound) {
-			notifications(accNumber + " does not exist.", false);
-		}
+		if (!accountFound) { notifications(accNumber + " does not exist.", false); }
 	}
 
 
@@ -514,40 +421,25 @@ public class Controller {
 		StringBuilder print = new StringBuilder();
 		for (int i = 0; i < accountDB.size(); i++) {
 			Account account = accountDB.get(i);
-			if (account.getNumber().toString().equals(number)) {
-				found = true;
+			if (account.getNumber().toString().equals(number)) { found = true;
 				print.append("Closing account ").append(account.getNumber().toString()).append("\n");
-				if (account.getNumber().getType() != AccountType.CD) {
-					interest = calculateInterestClosing(account, close);
-					print.append("--interest earned: $").append(String.format("%,.2f", interest)).append("\n");
+				if (account.getNumber().getType() != AccountType.CD) { interest = calculateInterestClosing(account, close); print.append("--interest earned: $").append(String.format("%,.2f", interest)).append("\n");
 				} else {
 					CertificateDeposit cd = (CertificateDeposit) account;
-					if (close.compareTo(cd.getOpen()) < 0) {
-						notifications("Closing date is earlier than the opening date of the Certificate Deposit account, please choose a date that is after.", false);
-						return;
-					}
+					if (close.compareTo(cd.getOpen()) < 0) { notifications("Closing date is earlier than the opening date of the Certificate Deposit account, please choose a date that is after.", false); return; }
 
 					interest = cd.calculateClosingInterest(close);
 					if (close.compareTo(cd.getMaturityDate()) < 0) {
 						penalty = cd.calculatePenalty(close);
 						print.append("--interest earned: $").append(String.format("%,.2f", interest)).append("\n");
 						print.append("--penalty: $").append(String.format("%,.2f", penalty)).append("\n");
-					} else {
-						print.append("--interest earned: $").append(String.format("%,.2f", interest)).append("\n");
-					}
+					} else { print.append("--interest earned: $").append(String.format("%,.2f", interest)).append("\n"); }
 				}
-				if (account.getNumber().getType() == AccountType.CHECKING) {
-					holder = account.getHolder();
-					closedChecking = true;
-				}
+				if (account.getNumber().getType() == AccountType.CHECKING) { holder = account.getHolder(); closedChecking = true; }
 				accountDB.getArchive().add(account, close);
 				accountDB.remove(account);
 				alert(print.toString(), true);
-				if (closedChecking && holder != null) {
-					removeLoyalStatus(accountDB, holder);
-				}
-				return;
-			}
+				if (closedChecking && holder != null) { removeLoyalStatus(accountDB, holder); } return; }
 		}
 		notifications(number + " account does not exist.", false);
 	}
@@ -564,28 +456,17 @@ public class Controller {
 		String lName = closeLName.getText().trim();
 		Date dob = new Date(closeProfileDob.getValue().toString());
 		StringBuilder print = new StringBuilder();
-		if (closeDate.getValue() == null || fName.isEmpty() || lName.isEmpty() || closeProfileDob.getValue() == null) {
-			notifications("Fill in the required fields.", false);
-			return;
-		}
+		if (closeDate.getValue() == null || fName.isEmpty() || lName.isEmpty() || closeProfileDob.getValue() == null) { notifications("Fill in the required fields.", false); return; }
 		double interest = 0;
 		double penalty = 0;
 		boolean found = false;
 		for (int i = accountDB.size() - 1; i >= 0; i--) {
 			Account account = accountDB.get(i);
-			if (account.getHolder().getFirstName().equalsIgnoreCase(fName)
-					&& account.getHolder().getLastName().equalsIgnoreCase(lName)
-					&& account.getHolder().getDateOfBirth().equals(new Date(closeProfileDob.getValue().toString()))) {
-				if (!found) {
-					print.append("Closing accounts for ").append(fName).append(" ").append(lName).append(" ").append(dob).append("\n");
-					found = true;
-				}
+			if (account.getHolder().getFirstName().equalsIgnoreCase(fName) && account.getHolder().getLastName().equalsIgnoreCase(lName) && account.getHolder().getDateOfBirth().equals(new Date(closeProfileDob.getValue().toString()))) {
+				if (!found) { print.append("Closing accounts for ").append(fName).append(" ").append(lName).append(" ").append(dob).append("\n"); found = true; }
 				if (account.getNumber().getType() == AccountType.CD) {
 					CertificateDeposit cd = (CertificateDeposit) account;
-					if (close.compareTo(cd.getOpen()) < 0) {
-						notifications("Closing date is earlier than the opening date of the Certificate Deposit account, please choose a date that is after.", false);
-						return;
-					}
+					if (close.compareTo(cd.getOpen()) < 0) { notifications("Closing date is earlier than the opening date of the Certificate Deposit account, please choose a date that is after.", false); return; }
 					interest = cd.calculateClosingInterest(close);
 					penalty = cd.calculatePenalty(close);
 					print.append("--").append(account.getNumber()).append(" interest earned: ").append(String.format("$%,.2f", interest)).append("\n");
@@ -681,7 +562,6 @@ public class Controller {
 		}
 	}
 
-
 	/**
 	 * This method handles the PH command
 	 *
@@ -695,7 +575,6 @@ public class Controller {
 			outputTextArea.setText("Database is empty.");
 		}
 	}
-
 
 	/**
 	 * This method handles the PS command.
@@ -906,6 +785,21 @@ public class Controller {
 	}
 
 	/**
+	 * This changes the branch selection after clearing fields.
+	 * @param branch the branch to switch to
+	 * @return returns the branch
+	 */
+	private String changeBranch(Branch branch) {
+		return switch (branch) {
+			case EDISON -> "EDISON";
+			case BRIDGEWATER -> "BRIDGEWATER";
+			case PRINCETON-> "PRINCETON";
+			case PISCATAWAY -> "PISCATAWAY";
+			case WARREN -> "WARREN";
+		};
+	}
+
+	/**
 	 * Initializes the controller when the FXML file is loaded.
 	 */
 	public void initialize() {
@@ -917,8 +811,10 @@ public class Controller {
 		if (termsToggleGroup == null) {
 			termsToggleGroup = new ToggleGroup();
 		}
+
 		ObservableList<AccountType> types = FXCollections.observableArrayList(AccountType.values());
 		accountTypeComboBox.setItems(types);
+
 
 		accountTypeComboBox.setCellFactory(ListView -> new ListCell<AccountType>() {
 			@Override
@@ -932,18 +828,39 @@ public class Controller {
 			@Override
 			protected void updateItem(AccountType type, boolean empty) {
 				super.updateItem(type, empty);
-				setText((empty || type == null) ? null : changeAccountTypeFormat(type));
+				if (empty || type == null) {
+					setText("Account Type");
+				} else {
+					setText(changeAccountTypeFormat(type));
+				}
 			}
 		});
 
 		ObservableList<Branch> branches = FXCollections.observableArrayList(Branch.values());
 		branchComboBox.setItems(branches);
 
+		branchComboBox.setButtonCell(new ListCell<Branch>() {
+			@Override
+			protected void updateItem(Branch branch, boolean empty) {
+				super.updateItem(branch, empty);
+				if (empty || branch == null) {
+					setText("Branch");
+				} else {
+					setText(changeBranch(branch));
+				}
+			}
+		});
+
 		accountTypeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			hideElements(newValue);
+			if (newValue != null) {
+				hideElements(newValue);
+
+			}
 		});
 
 
 	}
+
+
 
 }
