@@ -32,41 +32,18 @@ import java.util.StringTokenizer;
 public class Controller {
 	private static final double MONEY_MARKET_MINIMUM_FOR_LOYAL = 5000.0;
 	private static final double MONEY_MARKET_MINIMUM = 2000.0;
-	public Button loadAccountsButton;
-	public Button loadActivitiesButton;
-	public TextArea outputTextArea;
 	private AccountDatabase accountDB;
 
-	@FXML private TextField accountNumber;
-	@FXML private TextField transactionAmount;
-	@FXML private Button deposit;
-	@FXML private Button withdraw;
-	@FXML private Button printByBranchButton;
-	@FXML private Button printByTypeButton;
-	@FXML private Button printByHolderButton;
-	@FXML private Button printStatementsButton;
-	@FXML private Button printArchiveButton;
-	@FXML private TextField closeFName;
-	@FXML private TextField closeLName;
-	@FXML private DatePicker closeProfileDob;
-	@FXML private Button closeByProfile;
-	@FXML private DatePicker closeDate;
-	@FXML private TextField closeAccountNumber;
-	@FXML private Button closeByNumber;
-	@FXML private HBox termBox;
-	@FXML private Button openAccount;
-	@FXML private Button clearFields;
-	@FXML private TextField lName;
-	@FXML private TextField fName;
-	@FXML private DatePicker dobValue;
-	@FXML private HBox campusBox;
-	@FXML private CheckBox loyalCustomerCheckBox;
-	@FXML private DatePicker cdDateOpen;
-	@FXML private TextField initialDeposit;
+	@FXML private Button loadAccountsButton, loadActivitiesButton, deposit, withdraw, printByBranchButton, printByTypeButton, printByHolderButton, printStatementsButton, printArchiveButton;
+	@FXML private Button closeByProfile, closeByNumber, openAccount, clearFields;
+	@FXML private TextField accountNumber, transactionAmount, closeFName, closeLName, closeAccountNumber, lName, fName, initialDeposit;
+	@FXML private DatePicker closeProfileDob, closeDate, dobValue, cdDateOpen;
+	@FXML private HBox termBox, campusBox;
 	@FXML private ComboBox<AccountType> accountTypeComboBox;
 	@FXML private ComboBox<Branch> branchComboBox;
-	@FXML private ToggleGroup campusToggleGroup;
-	@FXML private ToggleGroup termsToggleGroup;
+	@FXML private ToggleGroup campusToggleGroup, termsToggleGroup;
+	@FXML private CheckBox loyalCustomerCheckBox;
+	@FXML private TextArea outputTextArea;
 
 	/**
 	 *  This method disables the UI elements depending on the account type.
