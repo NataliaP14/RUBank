@@ -24,7 +24,7 @@ import java.util.StringTokenizer;
 /**
  *	This class manages the user interactions for the JavaFX application.
  *	It connects the UI interactions with their underlying logic.
- * @Author Natalia Peguero, Olivia Kamau
+ * @author Natalia Peguero, Olivia Kamau
  */
 public class Controller {
 	private static final double MONEY_MARKET_MINIMUM_FOR_LOYAL = 5000.0;
