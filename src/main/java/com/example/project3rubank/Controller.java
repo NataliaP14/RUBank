@@ -370,7 +370,6 @@ public class Controller {
 	}
 
 
-
 	/**
 	 * This method handles the D command (deposit)
 	 * @param actionEvent
@@ -389,21 +388,17 @@ public class Controller {
 
 		try {
 			amount = Double.parseDouble(amountString);
-			if (amount <= 0) {
-				notifications(String.format("%,.2f - deposit amount cannot be 0 or negative.", amount), false);
-				return; }
+			if (amount <= 0) { notifications(amount + " - deposit amount cannot be 0 or negative.", false); return; }
 		} catch(NumberFormatException e) {
-			notifications(String.format("For input string: \" %s \" - not a valid amount.", amountString), false);
-			return;
+			notifications("For input string: \"" + amountString + "\" - not a valid amount.", false); return;
 		}
 		boolean accountFound = false;
 
 		for (int i = 0; i < accountDB.size(); i++) {
 			if (accountDB.get(i).getNumber().toString().equals(accNumber)) { accountFound = true;
-
 				accountDB.deposit(accountDB.get(i).getNumber(), amount);
-				notifications(String.format("$" + String.format("%,.2f", amount) +
-						" deposited to " + accNumber), true);
+				notifications("$" + String.format("%,.2f", amount) +
+						" deposited to " + accNumber, true);
 
 				if (accountDB.get(i).getNumber().getType() == AccountType.MONEY_MARKET) {
 					MoneyMarket moneyAcc = (MoneyMarket) accountDB.get(i);
@@ -416,7 +411,7 @@ public class Controller {
 				break;
 			}
 		}
-		if (!accountFound) { notifications(String.format(accNumber + " does not exist."), false); }
+		if (!accountFound) { notifications(accNumber + " does not exist.", false); }
 
 	}
 
@@ -441,11 +436,11 @@ public class Controller {
 		try {
 			amount = Double.parseDouble(amountString);
 			if(amount <= 0){
-				notifications(String.format(amountString + " withdrawal amount cannot be 0 or negative."), false);
+				notifications(amountString + " withdrawal amount cannot be 0 or negative.", false);
 				return;
 			}
 		} catch (NumberFormatException e) {
-			notifications(String.format("For input string: \"" + amountString + "\" - not a valid amount."), false);
+			notifications("For input string: \"" + amountString + "\" - not a valid amount.", false);
 			return;
 		}
 
@@ -465,16 +460,12 @@ public class Controller {
 						moneyAcc.incrementWithdrawals();
 
 						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
-							notifications(String.format("%s balance below $2,000 - ", accNumber), false);
 							if (amount <= accountDB.get(i).getBalance()) {
-
-								notifications(String.format("$%,.2f withdrawn from %s",amount, accNumber), true);
+								notifications(accNumber + "\" balance below $2,000 - \" $" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true);
 							}
 						}
 						else {
-								if (amount <= accountDB.get(i).getBalance()) {
-									notifications(String.format("$%,.2f withdrawn from %s",amount, accNumber), true);
-								}
+							if (amount <= accountDB.get(i).getBalance()) { notifications("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true); }
 						}
 
 						if (accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM_FOR_LOYAL) {
@@ -482,24 +473,23 @@ public class Controller {
 						}
 						return;
 					}
-					notifications(String.format("$%,.2f withdrawn from %s",amount, accNumber), true);
+					notifications("$" + String.format("%,.2f", amount) + " withdrawn from " + accNumber, true);
 					return;
 				}
 				if (amount > accountDB.get(i).getBalance() && accountDB.get(i).getBalance() < MONEY_MARKET_MINIMUM) {
-					notifications(String.format("%s balance below $2,000 - withdrawing $%,.2f - insufficient funds.", accNumber, amount), false);
+					notifications(accNumber + " balance below $2,000 - " + "withdrawing $" + String.format("%,.2f", amount) + " - insufficient funds.", false);
 					return;
 				}
 				else if (amount > accountDB.get(i).getBalance()) {
-					notifications(String.format("%s - insufficient funds.", accNumber), false);
+					notifications(accNumber + " - insufficient funds.", false);
 					return;
 				}
 				break;
 			}
 		}
-		if(!accountFound) {
-			notifications(String.format("%s does not exist.", accNumber), false);
-		}
+		if(!accountFound) { notifications(accNumber + " does not exist.", false); }
 	}
+
 
 
 	@FXML
